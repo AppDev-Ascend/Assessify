@@ -25,10 +25,11 @@ SECRET_KEY = 'django-insecure-u@b(7$2zrl$l7!*(4!a#whm-%h8$m7^r#*wb=sw135dl^=a+*2
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000', # React App
+    'http://127.0.0.1:3000',
     'http://localhost:8000', # Django App
 ]
 CORS_ALLOWED_CREDENTIALS = True
@@ -43,6 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'corsheaders',
     'api.apps.ApiConfig'
 ]
 
@@ -62,7 +65,7 @@ ROOT_URLCONF = 'AppDevFinalProject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
+        'DIRS': []
         ,
         'APP_DIRS': True,
         'OPTIONS': {
@@ -92,6 +95,19 @@ DATABASES = {
         'PORT': '3306',
     }
 }
+
+# User model
+AUTH_USER_MODEL = 'api.User'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
