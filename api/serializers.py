@@ -1,8 +1,9 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model, authenticate
-from rest_framework.exceptions import ValidationError
+from django.contrib.auth import get_user_model, authenticate, login
+from django.core.exceptions import ValidationError
 
-from api.models import Teacher, Student, User, Course
+from api.models import Assessment, User
+from api.validations import login_validation, register_validation, validate_assessment
 
 UserModel = get_user_model()
 
@@ -10,58 +11,63 @@ UserModel = get_user_model()
 class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
-        fields = '__all__'
+        fields = ['email', 'username', 'password']
 
-    def create(self, clean_data):
-        user_obj = UserModel.objects.create_user(email=clean_data['email'], password=clean_data['password'])
-        user_obj.username = clean_data['username']
-        user_obj.save()
-        return user_obj
+    def create(self, data):
+        try:
+            register_validation(data)
+            email = data['email']
+            username = data['username']
+            password = data['password']
+            user = UserModel.objects.create_user(email, username, password)
+            return user
+        except ValidationError as e:
+            raise ValidationError(e.message)
 
 
 class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
 
-    ##
-    def check_user(self, clean_data):
-        user = authenticate(username=clean_data['email'], password=clean_data['password'])
-        if not user:
-            raise ValidationError('user not found')
-        return user
+    def check_user(self, data):
+        try:
+            user = login_validation(data)
+            return user
+        except ValidationError as e:
+            raise ValidationError(e.message)
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
-        fields = ('email', 'username')
+        fields = ['user_id', 'email', 'username']
 
 
-class CourseCreateSerializer(serializers.Serializer):
-    name = serializers.CharField()
+class AssessmentsSerializer(serializers.Serializer):
 
-    def validate_name(self, value):
-        existing_name = Course.objects.filter(name=value).first()
-
-        if existing_name:
-            raise ValidationError("A course with this name already exists.")
-
-    # def create(self, validated_data):
-    #     a
+    def get_assessments(self, user_id):
+        assessments = Assessment.objects.filter(user_id=user_id).values()
+        return assessments
 
 
-class CourseEnrollSerializer(serializers.Serializer):
-    code = serializers.CharField()
-
-    def check_code(self, clean_data):
-        enrolled = authenticate(code=clean_data['code'])
-        if not enrolled:
-            raise ValidationError('code not found')
-        return enrolled
-
-
-class CourseSerializer(serializers.ModelSerializer):
+class AssessmentAddSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Course
-        fields = ('id', 'name', 'code', 'created_by_teacher', 'created_at')
-        read_only_fields = ['code', 'created_by_teacher', 'created_at']
+        model = Assessment
+        fields = [
+            'name',
+            'type',
+            'description',
+            'lesson',
+            'no_of_questions',
+            'learning_outcomes',
+            'user'
+        ]
+
+    def create(self, data):
+        try:
+            validated_data = validate_assessment(data)
+            assessment = Assessment(**validated_data)
+            assessment.add_assessment(validated_data)
+            return assessment
+        except ValidationError as e:
+            raise ValidationError(e.message)
