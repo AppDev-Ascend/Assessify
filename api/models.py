@@ -1,8 +1,7 @@
 from django.db import models
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser
-from . import asssessment_generator
-
+from . import assessment_generator
 
 class UserManager(BaseUserManager):
     def create_user(self, email, username, password):
@@ -32,10 +31,10 @@ class User(AbstractBaseUser):
 
 
 class Assessment(models.Model):
-    TYPE_CHOICES = [('quiz', 'Quiz'), ('exam', 'Exam')]
+    TYPE_CHOICES = [('multiple choice', 'Multiple Choice'), ('identification', 'Identification'),('true or false', 'True or False'), ('fill in the blanks', 'Fill in the Blanks'),]
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=128, null=False)
-    type = models.CharField(max_length=4, choices=TYPE_CHOICES, null=False)
+    type = models.CharField(max_length=50, choices=TYPE_CHOICES, null=False)
     description = models.TextField()
     lesson = models.TextField()
     no_of_questions = models.IntegerField(null=False)
@@ -57,65 +56,65 @@ class Assessment(models.Model):
         self.save()
 
         # API CALL
-        # ai = asssessment_generator()
-        # questions = ai.get_assessment(self.lesson, self.type, self.no_of_questions, self.learning_outcomes)
+        ai = assessment_generator.AI()
+        questions = ai.get_quiz(self.lesson, self.type, self.no_of_questions, self.learning_outcomes)
 
-        # SAMPLE API CALL RESULT
-        questions = {"type": "Multiple Choice",
-                     "questions":
-                         [
-                             {
-                                 "question": "What is the purpose of the Prototype pattern?",
-                                 "options": [
-                                     "To create new objects from scratch",
-                                     "To copy an existing object as a blueprint for creating new objects",
-                                     "To reduce the complexity of object creation",
-                                     "To maintain object relationships"
-                                 ],
-                                 "answer": 2
-                             },
-                             {
-                                 "question": "Which component is responsible for creating new objects using the Prototype pattern?",
-                                 "options": [
-                                     "Prototype",
-                                     "Concrete Prototype",
-                                     "Client",
-                                     "Prototype Registry"
-                                 ],
-                                 "answer": 3
-                             },
-                             {
-                                 "question": "When is the Prototype pattern useful?",
-                                 "options": [
-                                     "When object creation is more efficient by copying an existing object",
-                                     "When a class cannot anticipate the type of objects it must create",
-                                     "When configuring complex objects with different properties",
-                                     "All of the above"
-                                 ],
-                                 "answer": 4
-                             },
-                             {
-                                 "question": "What are the pros of using the Prototype pattern?",
-                                 "options": [
-                                     "Object creation efficiency and flexible object creation",
-                                     "Reduced complexity and maintains object relationships",
-                                     "Efficient cloning and reduced need for proper initialization",
-                                     "All of the above"
-                                 ],
-                                 "answer": 4
-                             },
-                             {
-                                 "question": "What are the cons of using the Prototype pattern?",
-                                 "options": [
-                                     "Cloning complexity and potential for inefficient cloning",
-                                     "Need for proper initialization and maintaining prototypes",
-                                     "Object creation efficiency and reduced complexity",
-                                     "All of the above"
-                                 ],
-                                 "answer": 1
-                             }
-                         ]
-                     }
+        # # SAMPLE API CALL RESULT
+        # questions = {"type": "Multiple Choice",
+        #              "questions":
+        #                  [
+        #                      {
+        #                          "question": "What is the purpose of the Prototype pattern?",
+        #                          "options": [
+        #                              "To create new objects from scratch",
+        #                              "To copy an existing object as a blueprint for creating new objects",
+        #                              "To reduce the complexity of object creation",
+        #                              "To maintain object relationships"
+        #                          ],
+        #                          "answer": 2
+        #                      },
+        #                      {
+        #                          "question": "Which component is responsible for creating new objects using the Prototype pattern?",
+        #                          "options": [
+        #                              "Prototype",
+        #                              "Concrete Prototype",
+        #                              "Client",
+        #                              "Prototype Registry"
+        #                          ],
+        #                          "answer": 3
+        #                      },
+        #                      {
+        #                          "question": "When is the Prototype pattern useful?",
+        #                          "options": [
+        #                              "When object creation is more efficient by copying an existing object",
+        #                              "When a class cannot anticipate the type of objects it must create",
+        #                              "When configuring complex objects with different properties",
+        #                              "All of the above"
+        #                          ],
+        #                          "answer": 4
+        #                      },
+        #                      {
+        #                          "question": "What are the pros of using the Prototype pattern?",
+        #                          "options": [
+        #                              "Object creation efficiency and flexible object creation",
+        #                              "Reduced complexity and maintains object relationships",
+        #                              "Efficient cloning and reduced need for proper initialization",
+        #                              "All of the above"
+        #                          ],
+        #                          "answer": 4
+        #                      },
+        #                      {
+        #                          "question": "What are the cons of using the Prototype pattern?",
+        #                          "options": [
+        #                              "Cloning complexity and potential for inefficient cloning",
+        #                              "Need for proper initialization and maintaining prototypes",
+        #                              "Object creation efficiency and reduced complexity",
+        #                              "All of the above"
+        #                          ],
+        #                          "answer": 1
+        #                      }
+        #                  ]
+        #              }
         questions_list = {'assessment': self, 'questions': questions['questions']}
         for i, q in enumerate(questions_list['questions']):
             question = Question()
