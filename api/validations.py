@@ -45,7 +45,7 @@ def validate_email(email, type):
     if re.match(email_regex, email) is None:
         raise ValidationError('invalid email address')
 
-    if type is "login":
+    if type == "login":
         if UserModel.objects.filter(email=email).exists() is False:
             raise ValidationError('email does not exist')
     else:
