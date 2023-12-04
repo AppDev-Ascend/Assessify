@@ -1,17 +1,15 @@
-import json
-import urllib
-
 from django.contrib.auth import get_user_model, login, logout
 from django.core.exceptions import ValidationError
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .forms import RegisterForm, LoginForm, AssessmentAddForm
-from .models import User
-from .serializers import UserRegisterSerializer, UserLoginSerializer, AssessmentsSerializer, AssessmentAddSerializer
+from .forms import RegisterForm, LoginForm, AssessmentAddForm, AssessmentQuestionForm, AssessmentOptionForm
+from .models import User, Question, Option
+from .serializers import UserRegisterSerializer, UserLoginSerializer, AssessmentsSerializer, AssessmentAddSerializer, \
+    AssessmentQuestionSerializer
 from rest_framework import permissions, status
 
 
@@ -114,7 +112,7 @@ class AssessmentAddView(APIView):
         form = AssessmentAddForm()
         return render(request, template, {'form': form})
 
-    # Returns dictionary of the newly added Assessment
+    # Returns dictionary of the Assessment
     def post(self, request):
         try:
             data = request.data.copy()
@@ -122,7 +120,84 @@ class AssessmentAddView(APIView):
             user = User.objects.get(pk=user_id)
             data['user'] = user
             serializer = AssessmentAddSerializer(data)
-            serializer.create(data)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            questions = serializer.create(data)
+            request.session['assessment'] = questions['assessment']
+            return redirect(reverse('assessment_questions'))
         except ValidationError as e:
             return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AssessmentQuestionsView(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (SessionAuthentication,)
+    template_name = 'api/assessment_question.html'
+
+    def get(self, request):
+        assessment = request.session['assessment']
+        questions = Question.objects.filter(assessment_id=assessment)
+        q_list = list(questions)
+        form_list = []
+
+        for q in q_list:
+            q_form = AssessmentQuestionForm(instance=q)
+            print(q.pk)
+            q_form.prefix = f'question_{q.pk}_content'  # Set a unique prefix for each question form
+            form_list.append(q_form)
+
+            options = Option.objects.filter(question_id=q.pk)
+            o_list = list(options)
+            for o in o_list:
+                o_form = AssessmentOptionForm(instance=o)
+                o_form.prefix = f'option_q-{q.pk}_o-{o.pk}_content'  # Set a unique prefix for each option form
+                form_list.append(o_form)
+
+        return render(request, template_name=self.template_name, context={'form_list': form_list})
+
+    def post(self, request):
+        print(request.POST.items())
+        ctr = 0
+        for key, value in request.POST.items():
+            print(f'Key: {key}, Value: {value}')
+            if key.startswith('question_'):
+                string = key.split('_')
+                q_id = int(string[1])
+                qc = string[2].split('-')[1]
+                question = Question.objects.get(id=q_id)
+
+                if qc == "question_no":
+                    # print(f'question_no: {value}')
+                    question.question_no = value
+                elif qc == "question":
+                    # print(f'question: {value}')
+                    question.question = value
+                elif qc == "answer":
+                    # print(f'answer: {value}')
+                    question.answer = value
+
+                question.save()
+
+            elif key.startswith('option_'):
+                string = key.split('_')
+                o_id = string[2].split('-')[1]
+                option = Option.objects.get(id=o_id)
+                if ctr == 0:
+                    option.option_no = value
+                    ctr += 1
+                else:
+                    option.option = value
+                    ctr -= 1
+                option.save()
+
+        return Response(request.data, status=status.HTTP_202_ACCEPTED)
+
+
+class ExportView(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (SessionAuthentication,)
+
+    def get(self, request):
+        return Response(request.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        return Response(request.data, status=status.HTTP_200_OK)
+

@@ -1,7 +1,8 @@
 from django import forms
 from django.core.validators import MinValueValidator
+from django.forms import formset_factory
 
-from api.models import User, Assessment
+from api.models import User, Assessment, Question, Option
 
 
 class RegisterForm(forms.Form):
@@ -47,3 +48,22 @@ class AssessmentAddForm(forms.Form):
     learning_outcomes = forms.CharField(widget=forms.Textarea(attrs={'label': 'Learning Outcomes',
                                                                      'placeholder': 'Enter learning outcomes '
                                                                                     '(separate with a comma)'}))
+
+
+class AssessmentQuestionForm(forms.ModelForm):
+    class Meta:
+        model = Question
+        fields = ['question_no', 'question', 'answer']
+        widgets = {
+            'question_no': forms.TextInput(attrs={'readonly': 'readonly'}),
+        }
+
+
+class AssessmentOptionForm(forms.ModelForm):
+    class Meta:
+        model = Option
+        fields = ['option_no', 'option']
+
+
+
+
