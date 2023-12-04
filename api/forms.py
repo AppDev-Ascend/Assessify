@@ -58,7 +58,6 @@ class AssessmentQuestionForm(forms.ModelForm):
             'question_no': forms.TextInput(attrs={'readonly': 'readonly'}),
         }
 
-
 class AssessmentOptionForm(forms.ModelForm):
     class Meta:
         model = Option
