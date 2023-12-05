@@ -1,200 +1,113 @@
-from openai import OpenAI
+import openai
 from dotenv import load_dotenv
 import os
 import json
 import time
+from llama_index import VectorStoreIndex, SimpleDirectoryReader
+from llama_index.output_parsers import GuardrailsOutputParser
+from llama_index.llm_predictor import StructuredLLMPredictor
+
+from pydantic import BaseModel, Field
+from typing import List, Optional
+import guardrails as gd
+
+from llama_index.prompts import PromptTemplate
+from llama_index.prompts.default_prompts import (
+    DEFAULT_TEXT_QA_PROMPT_TMPL,
+    DEFAULT_REFINE_PROMPT_TMPL,
+)
+
+class Question(BaseModel):
+    question: str = Field(...)
+    options: List[str] = Field(...)
+    answer: int = Field(...)
+
+class Response(BaseModel):
+    type: str = Field(...)
+    questions: List[Question] = Field(...)
+
+class Assessment(BaseModel):
+    type: str = Field(...)
+    questions: List[Question] = Field(...)
 
 class AI:
 
     def __init__(self):
         # Load environment variables from .env file
         load_dotenv()
-        OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-        self.client = OpenAI(api_key=OPENAI_API_KEY)
+        openai.api_key = os.environ.get("OPENAI_API_KEY")
 
-    def get_quiz(self, lesson, assessment_type, number_of_questions, learning_outcomes) -> dict:
-
-        """
-        Generate a quiz based on the specified assessment type and learning outcomes.
-
-        Parameters:
-        - lesson (str): The lesson for which the quiz is generated.
-        - assessment_type (str): The type of assessment (e.g., "Multiple Choice", "Identification").
-        - number_of_questions (int): The number of questions to generate for the quiz.
-        - learning_outcomes (list): A list of learning outcomes to guide question generation.
-
-        Returns:
-        dict: The generated quiz in dictionary format.
-
-        Note:
-        - The function uses GPT-3.5-turbo from OpenAI to generate quiz questions based on the provided information.
-        - The generated quiz is validated against the expected JSON structure for each assessment type.
-        - If the assessment generated does not match the expected format, the function prints an error message and exits.
-        - The generated quiz is saved to a JSON file named 'assessment_{assessment_type}.json'.
-        - The function returns the generated quiz in dictionary format.
-        """
+    def get_quiz(self, assessment_type, number_of_questions, learning_outcomes) -> dict:
 
         print(f"\n\nGenerating {number_of_questions} {assessment_type} Quiz...\n\n")
         assessment = ""
+        
+        # Create a new index
+        documents = SimpleDirectoryReader("Files").load_data()
+        index = VectorStoreIndex.from_documents(documents)
 
-        match(assessment_type):
-            case "Multiple Choice":
-                json_data = {
-                    "type": "Multiple Choice",
-                    "questions": [
-                    {
-                        "question": "Question",
-                        "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
-                        "answer": 1,
-                    }
-                    ]
-                }
-            case "Identification":
-                json_data = {
-                    "type": "Identification",
-                    "questions": [
-                    {
-                        "question": "Question",
-                        "answer": "Answer 1",
-                    }
-                    ]
-                }
-            case "True or False":
-                json_data = {
-                    "type": "True or False",
-                    "questions": [
-                    {
-                        "question": "Question",
-                        "answer": True,
-                    }
-                    ]
-                }
-            case "Fill in the Blanks":
-                json_data = {
-                    "type": "Fill in the Blanks",
-                    "questions": [
-                    {
-                        "question": "Question is ___",
-                        "answer": "Answer 1",
-                    }
-                    ]
-                }
-            case "Essay":
-                json_data = {
-                    "type": "Essay",
-                    "questions": [
-                    {
-                        "question": "Question",
-                    }
-                    ]
-                }
-            case _:
-                print("Error: Invalid Assessment Type")
+        # Define the prompt
+        prompt = """
+        Query string here.
 
-        json_string = json.dumps(json_data)
+        ${gr.xml_prefix_prompt}
 
-        question = "a flashcard question where the term is an answer" if assessment_type == "identification" else assessment_type
+        ${output_schema}
 
-        is_valid = False
-        while not is_valid:
-            # API Call to Generate Assessment
-            if json_data is not None:
-                completion = self.client.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=[
-                        {
-                            "role": "system",
-                            "content": f"You are an assessment generator who have no outside knowledge and must only generate questions based on the outputted lesson. The assessment generated should follow these learning outcomes: \n {learning_outcomes}\
-                                        Lastly, You must output the assessment in JSON format."
-                        },
-                        {
-                            "role": "user",
-                            "content": f"Compose an quiz for this lesson {lesson}. \n \
-                                        The quiz contains {number_of_questions} questions that is {question} \n \
-                                        Lastly, the output must be a JSON in this format: {json_string}"
-                        }
-                    ]
-                )
+        ${gr.json_suffix_prompt_v2_wo_none}
+        """
 
-                assessment = completion.choices[0].message.content
+        # Create a guard object
+        guard = gd.Guard.from_pydantic(output_class=Response, prompt=prompt)
 
-                # Test the Assessment Format
-                try:
-                    assessment_json = json.loads(assessment)
+        # Create output parse object
+        output_parser = GuardrailsOutputParser(guard)        
 
-                    if "type" in assessment_json and "questions" in assessment_json and isinstance(assessment_json["questions"], list):
-                        for question in assessment_json["questions"]:
-                            if assessment_json["type"] == "Multiple Choice":
-                                if "question" in question and "options" in question and "answer" in question:
-                                    is_valid = True
-                                else:
-                                    print("Error: Question in the Multiple Choice assessment does not match expected format.")
-                                    is_valid = False
-                                    break
-                            elif assessment_json["type"] == "Identification":
-                                if "question" in question and "answer" in question:
-                                    is_valid = True
-                                else:
-                                    print("Error: Question in the Identification assessment does not match expected format.")
-                                    is_valid = False
-                                    break
-                            elif assessment_json["type"] == "True or False":
-                                if "question" in question and "answer" in question:
-                                    is_valid = True
-                                else:
-                                    print("Error: Question in the True or False assessment does not match expected format.")
-                                    is_valid = False
-                                    break
-                            elif assessment_json["type"] == "Fill in the Blanks":
-                                if "question" in question and "answer" in question:
-                                    is_valid = True
-                                else:
-                                    print("Error: Question in the Fill in the Blanks assessment does not match expected format.")
-                                    is_valid = False
-                                    break
-                            elif assessment_json["type"] == "Essay":
-                                if "question" in question:
-                                    is_valid = True
-                                else:
-                                    print("Error: Question in the Essay assessment does not match expected format.")
-                                    is_valid = False
-                                    break
-                            else:
-                                print("Error: Invalid Assessment Type")
-                                is_valid = False
-                                break
-                    else:
-                        print("Error: Assessment JSON structure does not match expected format.")
-                        is_valid = False
+        fmt_qa_tmpl = output_parser.format(DEFAULT_TEXT_QA_PROMPT_TMPL)
+        fmt_refine_tmpl = output_parser.format(DEFAULT_REFINE_PROMPT_TMPL)
 
-                except json.JSONDecodeError:
-                    print(assessment)
-                    print("Error: Assessment is not in valid JSON format")
-                    is_valid = False
+        qa_prompt = PromptTemplate(fmt_qa_tmpl, output_parser=output_parser)
+        refine_prompt = PromptTemplate(fmt_refine_tmpl, output_parser=output_parser)
+
+        
+        query_engine = index.as_query_engine(
+            text_qa_template=qa_prompt,
+            refine_template=refine_prompt
+        )
+            
+        # Customize the promot
+        new_summary_tmpl_str = (
+            "Context information is below.\n"
+            "---------------------\n"
+            "{context_str}\n"
+            "---------------------\n"
+            "Given the context information and not prior knowledge.\n"
+            "Query: {query_str}\n"
+            "Answer: "
+        )
+
+        new_summary_tmpl = PromptTemplate(new_summary_tmpl_str)
+
+        query_engine.update_prompts(
+            {"response_synthesizer:summary_template": new_summary_tmpl}
+        )
+
+        # Prepare the Query
+        question = "a term question" if assessment_type == "identification" else assessment_type
+        formatted_learning_outcomes = "\n".join(learning_outcomes)
+
+        response = query_engine.query(f"Create a quiz that contains {number_of_questions} {question} questions for the following learning outcomes:\n\n{formatted_learning_outcomes}\n\n")
+        print(response)
+
+        exit()
+            
+        # Save assessment to a json file
+        with open(fr'Project Files\quiz_{assessment_type}.json', 'w') as f:
+            json.dump(assessment_json, f)
 
         return assessment_json
 
     def get_exam(self, lesson, exam_format, learning_outcomes) -> dict:
-        """
-        Generate an exam based on the specified format and learning outcomes.
-
-        Parameters:
-        - lesson (str): The lesson for which the exam is generated.
-        - exam_format (list): A list of tuples specifying the sections of the exam.
-          Each tuple contains:
-            - section_name (str): The name of the exam section.
-            - assessment_type (str): The type of assessment for the section (e.g., "Multiple Choice").
-            - question_count (int): The number of questions to generate for the section.
-        - learning_outcomes (list): A list of learning outcomes to guide question generation.
-
-        Returns:
-        dict: The generated exam in dictionary format.
-
-        Note:
-        - For testing purposes, there is a sleep of 60 seconds between generating sections
-          to comply with OpenAI API usage limits (3 requests per minute on a free account).
-        - The generated exam is also saved to a JSON file named 'assessment_exam.json'.
-        """
          
         print("Generating an exam...\n\n")
 
@@ -208,7 +121,6 @@ class AI:
 
             print(f"Generating Section {section_name}...\n\n")
 
-            # 
             questions = self.get_quiz(lesson, assessment_type, question_count, learning_outcomes)
             exam["sections"].append({
                 "section_name": section_name,
@@ -218,5 +130,9 @@ class AI:
 
             # for testing purposes, since OpenAI has a limit of 3 requests per minute on a free account
             time.sleep(20)
-            
+
+        # Save exam to a json file
+        with open(fr'Project Files\exam.json', 'w') as f:
+            json.dump(exam, f)
+        
         return exam

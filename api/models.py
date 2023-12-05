@@ -31,7 +31,7 @@ class User(AbstractBaseUser):
 
 
 class Assessment(models.Model):
-    TYPE_CHOICES = [('multiple choice', 'Multiple Choice'), ('identification', 'Identification'),('true or false', 'True or False'), ('fill in the blanks', 'Fill in the Blanks'),]
+    TYPE_CHOICES = [('multiple choice', 'Multiple Choice'), ('identification', 'Identification'),('true or false', 'True or False'), ('fill in the blanks', 'Fill in the Blanks'), ('essay', 'Essay')]
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=128, null=False)
     type = models.CharField(max_length=50, choices=TYPE_CHOICES, null=False)
