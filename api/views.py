@@ -20,6 +20,7 @@ from rest_framework import permissions, status
 
 class UserRegisterView(APIView):
     permission_classes = (permissions.AllowAny,)
+    authentication_classes = []
 
     # Modify for front-end here
     def get(self, request):
@@ -30,13 +31,11 @@ class UserRegisterView(APIView):
 
     # Returns a dictionary of the registered user
     def post(self, request):
-        try:
-            data = request.data
-            serializer = UserRegisterSerializer(data)
-            serializer.create(data)
-            return Response(serializer.data, status.HTTP_200_OK)
-        except ValidationError as e:
-            return Response({'error': e.message}, status.HTTP_400_BAD_REQUEST)
+        serializer = UserRegisterSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            user = serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Creates a sessionid when successfully logged in

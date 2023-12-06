@@ -56,7 +56,7 @@ class Assessment(models.Model):
         self.save()
 
         # API CALL
-        ai = assessment_generator.AI()
+        ai = assessment_generator.AssessmentGenerator()
         questions = ai.get_quiz(self.lesson, self.type, self.no_of_questions, self.learning_outcomes)
 
         # # SAMPLE API CALL RESULT
