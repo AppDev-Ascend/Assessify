@@ -9,5 +9,5 @@ urlpatterns = [
     path('assessments', views.AssessmentsView.as_view(), name='assessments'),
     path('assessment_add', views.AssessmentAddView.as_view(), name='assessment_add'),
     path('assessment_questions', views.AssessmentQuestionsView.as_view(), name='assessment_questions'),
-    path('export', views.ExportView.as_view(), name='export')
+    path('assessment_export', views.AssessmentExportView.as_view(), name='assessment_export')
 ]
