@@ -298,7 +298,7 @@ class AssessmentExportView(APIView):
 
 
             pdf_data = Converter.quiz_to_pdf(assessment=question_dict, type=assessment.type)
-            # converter.quiz_answer_key(question_dict, assessment.type)
+            Converter.quiz_answer_key(assessment=question_dict, type=assessment.type)
             
             return JsonResponse(question_dict, status=status.HTTP_200_OK)
         except Assessment.DoesNotExist:
