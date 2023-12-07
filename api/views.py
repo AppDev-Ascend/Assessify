@@ -1,16 +1,23 @@
-from django.contrib.auth import get_user_model, login, logout
+import json
+import os
+from django.forms.models import model_to_dict
+from django.contrib.auth import get_user_model, login, logout, authenticate
 from django.core.exceptions import ValidationError
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse
+from django.conf import settings
+from django.http import JsonResponse
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+from .validations import login_validation, register_validation, validate_assessment
 from .forms import RegisterForm, LoginForm, AssessmentAddForm, AssessmentQuestionForm, AssessmentOptionForm
-from .models import User, Question, Option
-from .serializers import UserRegisterSerializer, UserLoginSerializer, AssessmentsSerializer, AssessmentAddSerializer, \
-    AssessmentQuestionSerializer
+from .serializers import UserRegisterSerializer, UserLoginSerializer, UserSerializer, AssessmentsSerializer, AssessmentSerializer, AssessmentAddSerializer, AssessmentQuestionSerializer
 from rest_framework import permissions, status
+from .converter import Converter
+from .models import Assessment, User, Question, Option
+from .file_handler import handle_uploaded_file, handle_non_utf8
 
 
 # Notes:
@@ -20,6 +27,7 @@ from rest_framework import permissions, status
 
 class UserRegisterView(APIView):
     permission_classes = (permissions.AllowAny,)
+    authentication_classes = []
 
     # Modify for front-end here
     def get(self, request):
@@ -28,7 +36,10 @@ class UserRegisterView(APIView):
         form = RegisterForm()
         return render(request, template, {'form': form})
 
-    # Returns a dictionary of the registered user
+    # Returns the following JSON:
+    # {"email": "user3@example.com", 
+    #  "username": "user3", 
+    #  "password": "pbkdf2_sha256$600000$awBXPFYxGs09qg9xAL0nTQ$uQ7+ZGbgjjlZ6FAeMFpp7AvRYEK7HwpPOuNzXjw9Ti0="}
     def post(self, request):
         try:
             data = request.data
@@ -50,24 +61,30 @@ class UserLoginView(APIView):
         template = "api/login.html"
         form = LoginForm()
         return render(request, template, {'form': form})
-
-    # Redirects to homepage after logging in
+    
+    # Returns the following JSON:
+    # {"email": "user1@example.com", 
+    #  "password": "pbkdf2_sha256$600000$INUwHceAVcfMaUGycqDQ9c$bEZa715FdUFxXvp+Lr+tnH0CP2AbKKlAsOFgbRXlg6c="}
     def post(self, request):
         try:
-            data = request.data
-            serializer = UserLoginSerializer(data)
-            user = serializer.check_user(data)
-            login(request, user)
-            return redirect(reverse('homepage'))
+            validated_data = login_validation(request.data)
+            user = authenticate(request, 
+                                email=validated_data['email'],
+                                password=validated_data['password'])
+            if user is not None:
+                serializer = UserLoginSerializer(user)
+                login(request, user)
+                return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+            else:
+                raise ValidationError("Incorrect username or password")
         except ValidationError as e:
-            # Modify front-end here
-            return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Needs the logout() method to terminate the sessionid
 class UserLogoutView(APIView):
-    permission_classes = (permissions.AllowAny,)
-    authentication_classes = ()
+    permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (SessionAuthentication,)
 
     def post(self, request):
         logout(request)
@@ -79,10 +96,15 @@ class HomePageView(APIView):
     authentication_classes = (SessionAuthentication,)
 
     # Modify this for front-end
+    # Returns the following JSON:
+    # {"user_id": 1,
+    #  "email": "user1@example.com",
+    #  "username": "user1"}
     def get(self, request):
-        # Currently for testing
-        # serializer = UserSerializer(request.user)
-        return Response(request.session, status=status.HTTP_200_OK)
+        user_id = request.session['_auth_user_id']
+        user = User.objects.get(user_id=user_id)
+        serializer = UserSerializer(user)
+        return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
 
 
 # List of Assessments page
@@ -94,9 +116,10 @@ class AssessmentsView(APIView):
     # Returns a dictionary of a list of assessments
     def get(self, request):
         user_id = request.session['_auth_user_id']
-        assessments = AssessmentsSerializer()
-        data = assessments.get_assessments(user_id)
-        return Response(data, status=status.HTTP_200_OK)
+        assessments = Assessment.objects.filter(user_id=user_id)
+        serializer = AssessmentsSerializer(assessments, many=True)
+        # data = assessments.get_assessments(user_id)
+        return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
 
 
 # Adds assessments
@@ -112,20 +135,66 @@ class AssessmentAddView(APIView):
         form = AssessmentAddForm()
         return render(request, template, {'form': form})
 
-    # Returns dictionary of the Assessment
+    # Returns the following JSON:
+    # {"assessment": {
+    #     "name": "asdfas", "type": "multiple choice", "description": "asdfasdf", "lesson": "Page 1:\n\nPrototype Pattern Summary\n\nHistory\n\nThe first example of the Prototype pattern was in Ivan Sutherland's Sketchpad System in\n1964. In 1994, The Gang of Four popularized and codified the Prototype Pattern in their\nbook \"Design Patterns: Elements of Reusable Object-Oriented Software.\"\n\nDefinition\n\nA prototype pattern is a creational design pattern that focuses on creating objects by\ncopying an existing object, known as the \"prototype,\" rather than creating new instances\nfrom scratch. In this pattern, a prototype object serves as a blueprint, and new objects are\ncreated by duplicating this prototype.\n\nKey Components\n\nPrototype: The interface or abstract class that declares the methods for cloning itself.\nConcrete Prototype: The concrete classes that implement the Prototype interface or\nextend the Prototype abstract class.\n\nClient: Responsible for creating new objects by requesting the prototype to clone itself.\n\nUsages\n\nEfficient Object Creation: When object creation is more efficient by copying an existing\nobject rather than initializing a new one from scratch.\n\nReducing Subclassing: When a class cannot anticipate the type of objects it must create,\nthe Prototype Pattern allows for new object creation without relying on subclasses.\nConfiguring Objects: Allows for configuring complex objects with different properties.\n\nPros Cons\n\nObject Creation Efficiency Cloning Complexity\n\nFlexible Object Creation Need for Proper Initialization\nReduced Complexity Maintaining Prototypes\nMaintains Object Relationships Potential for Inefficient Cloning\n\nTwo ways to implement Prototype Pattern in Java\nUsing the Cloneable Interface and Creating a Custom Clone Method\n\nCloning Strategies\nShallow Copy and Deep Copy\n\nPrototype Registry: The Prototype Registry is a central repository or store that holds a\ncollection of pre-defined prototype objects.\n\nReal World Examples\n1. Creating similar video game characters with different attributes.\n2. Creating copies of GUI components (e.g., buttons, dialogs) to save time and\nresources when generating similar Ul elements.\n3. Cloning database records", "no_of_questions": 5, "learning_outcomes": "asdfasdf", "user": 1}, 
+    #     "questions": [{"question": "What is the purpose of the Prototype pattern?", "answer": "2", "options": [{"option_no": 1, "option": "To create new objects from scratch"}, {"option_no": 2, "option": "To copy an existing object as a blueprint for creating new objects"}, {"option_no": 3, "option": "To reduce the complexity of object creation"}, {"option_no": 4, "option": "To maintain object relationships"}]}, 
+    #                   {"question": "Which component is responsible for creating new objects using the Prototype pattern?", "answer": "3", "options": [{"option_no": 1, "option": "Prototype"}, {"option_no": 2, "option": "Concrete Prototype"}, {"option_no": 3, "option": "Client"}, {"option_no": 4, "option": "Prototype Registry"}]}, 
+    #                   {"question": "When is the Prototype pattern useful?", "answer": "4", "options": [{"option_no": 1, "option": "When object creation is more efficient by copying an existing object"}, {"option_no": 2, "option": "When a class cannot anticipate the type of objects it must create"}, {"option_no": 3, "option": "When configuring complex objects with different properties"}, {"option_no": 4, "option": "All of the above"}]}, 
+    #                   {"question": "What are the pros of using the Prototype pattern?", "answer": "4", "options": [{"option_no": 1, "option": "Object creation efficiency and flexible object creation"}, {"option_no": 2, "option": "Reduced complexity and maintains object relationships"}, {"option_no": 3, "option": "Efficient cloning and reduced need for proper initialization"}, {"option_no": 4, "option": "All of the above"}]}, {"question": "What are the cons of using the Prototype pattern?", "answer": "1", "options": [{"option_no": 1, "option": "Cloning complexity and potential for inefficient cloning"}, {"option_no": 2, "option": "Need for proper initialization and maintaining prototypes"}, {"option_no": 3, "option": "Object creation efficiency and reduced complexity"}, {"option_no": 4, "option": "All of the above"}]}]}
     def post(self, request):
         try:
-            data = request.data.copy()
+            data_copy = request.data.copy()
+            data_copy.pop('file')
+            validated_data = validate_assessment(data_copy)
             user_id = request.session['_auth_user_id']
             user = User.objects.get(pk=user_id)
-            data['user'] = user
-            serializer = AssessmentAddSerializer(data)
-            questions = serializer.create(data)
-            request.session['assessment'] = questions['assessment']
-            return redirect(reverse('assessment_questions'))
-        except ValidationError as e:
-            return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
+            validated_data['user'] = user_id
+            
+            if 'file' in request.FILES:
+                file = request.FILES['file']
+                path = os.path.join(settings.MEDIA_ROOT, 'files', file.name)
+                handle_uploaded_file(file)
+                file_format = file.name.split('.')[1].lower()
+                lesson = ''
+                
+                # pdf to text convert
+                if file_format == 'pdf':
+                    converter = Converter()
+                    lesson = converter.pdf_to_text(path)
+                    
+                validated_data['lesson'] = lesson
+                
+            else:
+                print('no file')
+                
+            serializer = AssessmentAddSerializer(data=validated_data)
+            if serializer.is_valid():
+                assessment = serializer.create(validated_data)
+                full_dict = {}
+                full_dict['assessment'] = serializer.data
+                question_list = list(Question.objects.filter(assessment=assessment))
+                question_data_list = []
+                
+                for i, q in enumerate(question_list):
+                    question_data = {
+                        'question': q.question,
+                        'answer': q.answer,
+                        'options': list(Option.objects.filter(question=q).values('option_no', 'option'))
+                    }
+                    question_data_list.append(question_data)
 
+                full_dict['questions'] = question_data_list
+                request.session['assessment'] = assessment.pk
+                json_data = json.dumps(full_dict)
+                
+                return JsonResponse(full_dict, safe=False, status=status.HTTP_200_OK)
+            else:
+                raise ValidationError("Invalid serializer data")
+            
+        except ValidationError as e:
+            return JsonResponse({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
+        
 
 class AssessmentQuestionsView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
@@ -153,6 +222,7 @@ class AssessmentQuestionsView(APIView):
 
         return render(request, template_name=self.template_name, context={'form_list': form_list})
 
+    
     def post(self, request):
         print(request.POST.items())
         ctr = 0
@@ -196,7 +266,37 @@ class ExportView(APIView):
     authentication_classes = (SessionAuthentication,)
 
     def get(self, request):
-        return Response(request.data, status=status.HTTP_200_OK)
+        try:
+            assessment_id = request.session['assessment']
+            assessment = Assessment.objects.get(id=assessment_id)
+            assessment_dict = model_to_dict(assessment)
+            json_data = json.dumps(assessment_dict)
+            serializer = AssessmentSerializer(instance=assessment)
+            full_dict = {}
+            question_list = list(Question.objects.filter(assessment=assessment))
+            question_data_list = []
+            
+            for i, q in enumerate(question_list):
+                question_data = {
+                    'question': q.question,
+                    'answer': q.answer,
+                    'options': list(Option.objects.filter(question=q).values('option_no', 'option'))
+                }
+                question_data_list.append(question_data)
+
+            full_dict['questions'] = question_data_list
+            request.session['assessment'] = assessment.pk
+            json_data = json.dumps(full_dict)
+            
+            converter = Converter()
+            pdf_data = converter.quiz_to_pdf(full_dict, assessment.type)
+            
+            return JsonResponse({"full_dict": full_dict}, status=status.HTTP_200_OK)
+        except Assessment.DoesNotExist:
+            return Response({"error": "Assessment not found"}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request):
+        
         return Response(request.data, status=status.HTTP_200_OK)
+
+
