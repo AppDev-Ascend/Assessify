@@ -3,6 +3,7 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser
 from . import assessment_generator
 
+
 class UserManager(BaseUserManager):
     def create_user(self, email, username, password):
         email = self.normalize_email(email)
@@ -45,86 +46,93 @@ class Assessment(models.Model):
     def __str__(self):
         return self.name
 
-    def add_assessment(self, data):
-        self.name = data['name']
-        self.type = data['type']
-        self.description = data['description']
-        self.lesson = data['lesson']
-        self.no_of_questions = int(data['no_of_questions'])
-        self.learning_outcomes = data['learning_outcomes']
-        self.user = data['user']
-        self.save()
+    def create_questions(self):
+        # self.name = data['name']
+        # self.type = data['type']
+        # self.description = data['description']
+        # self.lesson = data['lesson']
+        # self.no_of_questions = int(data['no_of_questions'])
+        # self.learning_outcomes = data['learning_outcomes']
+        # self.user = data['user']
+        # self.save()
 
         # API CALL
-        ai = assessment_generator.AI()
-        questions = ai.get_quiz(self.lesson, self.type, self.no_of_questions, self.learning_outcomes)
+        # ai = assessment_generator.AI()
+        # questions = ai.get_quiz(self.lesson, self.type, self.no_of_questions, self.learning_outcomes)
 
-        # # SAMPLE API CALL RESULT
-        # questions = {"type": "Multiple Choice",
-        #              "questions":
-        #                  [
-        #                      {
-        #                          "question": "What is the purpose of the Prototype pattern?",
-        #                          "options": [
-        #                              "To create new objects from scratch",
-        #                              "To copy an existing object as a blueprint for creating new objects",
-        #                              "To reduce the complexity of object creation",
-        #                              "To maintain object relationships"
-        #                          ],
-        #                          "answer": 2
-        #                      },
-        #                      {
-        #                          "question": "Which component is responsible for creating new objects using the Prototype pattern?",
-        #                          "options": [
-        #                              "Prototype",
-        #                              "Concrete Prototype",
-        #                              "Client",
-        #                              "Prototype Registry"
-        #                          ],
-        #                          "answer": 3
-        #                      },
-        #                      {
-        #                          "question": "When is the Prototype pattern useful?",
-        #                          "options": [
-        #                              "When object creation is more efficient by copying an existing object",
-        #                              "When a class cannot anticipate the type of objects it must create",
-        #                              "When configuring complex objects with different properties",
-        #                              "All of the above"
-        #                          ],
-        #                          "answer": 4
-        #                      },
-        #                      {
-        #                          "question": "What are the pros of using the Prototype pattern?",
-        #                          "options": [
-        #                              "Object creation efficiency and flexible object creation",
-        #                              "Reduced complexity and maintains object relationships",
-        #                              "Efficient cloning and reduced need for proper initialization",
-        #                              "All of the above"
-        #                          ],
-        #                          "answer": 4
-        #                      },
-        #                      {
-        #                          "question": "What are the cons of using the Prototype pattern?",
-        #                          "options": [
-        #                              "Cloning complexity and potential for inefficient cloning",
-        #                              "Need for proper initialization and maintaining prototypes",
-        #                              "Object creation efficiency and reduced complexity",
-        #                              "All of the above"
-        #                          ],
-        #                          "answer": 1
-        #                      }
-        #                  ]
-        #              }
-        questions_list = {'assessment': self, 'questions': questions['questions']}
+        # SAMPLE API CALL RESULT
+        questions = {"type": "Multiple Choice",
+                     "questions":
+                         [
+                             {
+                                 "question": "What is the purpose of the Prototype pattern?",
+                                 "options": [
+                                     "To create new objects from scratch",
+                                     "To copy an existing object as a blueprint for creating new objects",
+                                     "To reduce the complexity of object creation",
+                                     "To maintain object relationships"
+                                 ],
+                                 "answer": 2
+                             },
+                             {
+                                 "question": "Which component is responsible for creating new objects using the Prototype pattern?",
+                                 "options": [
+                                     "Prototype",
+                                     "Concrete Prototype",
+                                     "Client",
+                                     "Prototype Registry"
+                                 ],
+                                 "answer": 3
+                             },
+                             {
+                                 "question": "When is the Prototype pattern useful?",
+                                 "options": [
+                                     "When object creation is more efficient by copying an existing object",
+                                     "When a class cannot anticipate the type of objects it must create",
+                                     "When configuring complex objects with different properties",
+                                     "All of the above"
+                                 ],
+                                 "answer": 4
+                             },
+                             {
+                                 "question": "What are the pros of using the Prototype pattern?",
+                                 "options": [
+                                     "Object creation efficiency and flexible object creation",
+                                     "Reduced complexity and maintains object relationships",
+                                     "Efficient cloning and reduced need for proper initialization",
+                                     "All of the above"
+                                 ],
+                                 "answer": 4
+                             },
+                             {
+                                 "question": "What are the cons of using the Prototype pattern?",
+                                 "options": [
+                                     "Cloning complexity and potential for inefficient cloning",
+                                     "Need for proper initialization and maintaining prototypes",
+                                     "Object creation efficiency and reduced complexity",
+                                     "All of the above"
+                                 ],
+                                 "answer": 1
+                             }
+                         ]
+                     }
+        questions_list = {'questions': questions['questions']}
         for i, q in enumerate(questions_list['questions']):
-            question = Question()
-            question.add_question(no=i + 1, question=q['question'], answer=q['answer'], assessment=self)
+            question = Question.objects.create(
+                question_no=i + 1,
+                question=q['question'],
+                answer=q['answer'],
+                assessment=self
+            )
             options_list = q['options']
             for j, o in enumerate(options_list):
-                option = Option()
-                option.add_option(question=question, option_no=j + 1, option=o)
+                option = Option.objects.create(
+                    question=question,
+                    option_no=j + 1,
+                    option=o
+                )
 
-        return questions_list
+        return self
 
 
 class Question(models.Model):
@@ -133,23 +141,31 @@ class Question(models.Model):
     answer = models.TextField()
     assessment = models.ForeignKey(Assessment, on_delete=models.CASCADE)
 
-    def add_question(self, no, question, answer, assessment):
-        self.question_no = no
-        self.question = question
-        self.answer = answer
-        self.assessment = assessment
-        self.save()
-        return self
+    def __str__(self):
+        return self.question
+
+    # def create(self, no, question, answer, assessment):
+    #     question = super(QuestionSerializer, self).create(no, question, answer, assessment)
+    #     # self.question_no = no
+    #     # self.question = question
+    #     # self.answer = answer
+    #     # self.assessment = assessment
+    #     # self.save()
+    #     return question
 
 
 class Option(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, null=False)
     option_no = models.IntegerField(null=False)
     option = models.TextField(null=False)
-
-    def add_option(self, question, option_no, option):
-        self.question = question
-        self.option_no = option_no
-        self.option = option
-        self.save()
-        return self
+    
+    def __str__(self):
+        return self.option
+    
+    # def create(self, question, option_no, option):
+    #     option = super(OptionSerializer, self).create(no, question, answer, assessment)
+    #     # self.question = question
+    #     # self.option_no = option_no
+    #     # self.option = option
+    #     # self.save()
+    #     return option

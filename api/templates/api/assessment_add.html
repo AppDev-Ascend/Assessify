@@ -7,9 +7,8 @@
 <body>
     <h1>Add Assessment</h1>
 
-   <form method="post">
+   <form method="post"  enctype="multipart/form-data">
        {% csrf_token %}
-       {{ data }}
        {{ form.as_p }}
        <button type="submit">Add</button>
    </form>
