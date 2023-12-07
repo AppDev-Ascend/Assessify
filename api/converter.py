@@ -73,7 +73,7 @@ class Converter:
 
             question_text = question.get("question", "")
 
-            if type == "Multiple Choice":
+            if type == "multiple choice":
                 options = question.get("options", [])
                 pdf_canvas.drawString(x_position, y_position, f"{index}. {question_text}")
 
@@ -89,7 +89,7 @@ class Converter:
                             pdf_canvas.drawString(x_position + 28, y_position - 2, wrapped_option_line)
                         y_position -= line_height
 
-            elif type == "Identification":
+            elif type == "identification":
                 wrapped_text_lines = Converter.wrap_text(f"{index}. {question_text}", max_line_length)
                 for i, wrapped_text_line in enumerate(wrapped_text_lines):
                     if i == 0:
@@ -98,7 +98,7 @@ class Converter:
                         pdf_canvas.drawString(x_position + 15, y_position, wrapped_text_line)
                     y_position -= line_height
 
-            elif type == "True or False":
+            elif type == "true or false":
                 wrapped_text_lines = Converter.wrap_text(f"{index}. {question_text}", max_line_length)
                 for i, wrapped_text_line in enumerate(wrapped_text_lines):
                     if i == 0:
@@ -107,7 +107,7 @@ class Converter:
                         pdf_canvas.drawString(x_position + 15, y_position, wrapped_text_line)
                     y_position -= line_height
 
-            elif type == "Fill in the Blanks":
+            elif type == "fill in the blanks":
                 lines = Converter.wrap_text(f"{index}. {question_text}", max_line_length)
                 for i, line in enumerate(lines):
                     if i == 0:
@@ -116,7 +116,7 @@ class Converter:
                         pdf_canvas.drawString(x_position + 15, y_position-5, line)
                     y_position -= line_height
 
-            elif type == "Essay":
+            elif type == "essay":
                 lines = Converter.wrap_text(f"{index}. {question_text}", max_line_length)
                 for i, line in enumerate(lines):
                     if i == 0:
@@ -129,7 +129,6 @@ class Converter:
 
         # Save the PDF
         pdf_canvas.save()
-
 
     @staticmethod
     def quiz_answer_key(assessment, type):

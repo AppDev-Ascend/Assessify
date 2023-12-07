@@ -292,10 +292,13 @@ class AssessmentExportView(APIView):
 
             question_dict['questions'] = question_data_list
             request.session['assessment'] = assessment.pk
-            
-            converter = Converter()
-            pdf_data = converter.quiz_to_pdf(assessment=question_dict, type=assessment.type)
-            converter.quiz_answer_key(question_dict, assessment.type)
+
+            with open('question_dict.json', 'w') as f:
+                json.dump(question_dict, f)
+
+
+            pdf_data = Converter.quiz_to_pdf(assessment=question_dict, type=assessment.type)
+            # converter.quiz_answer_key(question_dict, assessment.type)
             
             return JsonResponse(question_dict, status=status.HTTP_200_OK)
         except Assessment.DoesNotExist:
