@@ -1,17 +1,17 @@
-from django.contrib.auth import get_user_model, login, logout
+from django.contrib.auth import login, logout
 from django.core.exceptions import ValidationError
-from django.shortcuts import redirect, render, get_object_or_404
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .forms import RegisterForm, LoginForm, AssessmentAddForm, AssessmentQuestionForm, AssessmentOptionForm
+from .forms import AssessmentAddForm, AssessmentQuestionForm, AssessmentOptionForm
 from .models import User, Question, Option
 from .serializers import UserRegisterSerializer, UserLoginSerializer, AssessmentsSerializer, AssessmentAddSerializer, \
     AssessmentQuestionSerializer
 from rest_framework import permissions, status
-
+from django.contrib.auth import authenticate
 
 # Notes:
 # permission_classes - specifies what kind of user can enter the view
@@ -22,12 +22,12 @@ class UserRegisterView(APIView):
     permission_classes = (permissions.AllowAny,)
     authentication_classes = []
 
-    # Modify for front-end here
-    def get(self, request):
-        # Currently for testing
-        template = "api/register.html"
-        form = RegisterForm()
-        return render(request, template, {'form': form})
+    """
+    {
+        "email": "testadmin1",
+        "password": "admin1234"
+    }
+    """
 
     # Returns a dictionary of the registered user
     def post(self, request):
@@ -43,24 +43,19 @@ class UserLoginView(APIView):
     permission_classes = (permissions.AllowAny,)
     authentication_classes = (SessionAuthentication,)
 
-    # Modify for front-end here
-    def get(self, request):
-        # Currently for testing
-        template = "api/login.html"
-        form = LoginForm()
-        return render(request, template, {'form': form})
-
-    # Redirects to homepage after logging in
     def post(self, request):
-        try:
-            data = request.data
-            serializer = UserLoginSerializer(data)
-            user = serializer.check_user(data)
+        serializer = UserLoginSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.check_user(serializer.validated_data)
             login(request, user)
-            return redirect(reverse('homepage'))
-        except ValidationError as e:
-            # Modify front-end here
-            return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'user_id': user.user_id,
+                'username': user.username,
+                'email': user.email,
+                'is_authenticated': user.is_authenticated,
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Needs the logout() method to terminate the sessionid
@@ -104,12 +99,23 @@ class AssessmentAddView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
     authentication_classes = (SessionAuthentication,)
 
-    # Modify here for front-end
-    def get(self, request):
-        # Currently for testing
-        template = "api/assessment_add.html"
-        form = AssessmentAddForm()
-        return render(request, template, {'form': form})
+    # # Modify here for front-end
+    # def get(self, request):
+    #     # Currently for testing
+    #     template = "api/assessment_add.html"
+    #     form = AssessmentAddForm()
+    #     return render(request, template, {'form': form})
+
+
+    # Json format
+    # {
+    #     name: "",
+    #     type: "",
+    #     description: "",
+    #     lesson: "",
+    #     no_of_questions: 5,
+    #     learn_outcomes: "",
+    # }
 
     # Returns dictionary of the Assessment
     def post(self, request):

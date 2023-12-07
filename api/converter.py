@@ -44,13 +44,13 @@ class Converter:
 
         Note:
         - This method creates a PDF document with formatted content based on the quiz assessment.
-        - The PDF is saved to the 'Files' directory with the naming convention 'assessment_{type}.pdf'.
+        - The PDF is saved to the 'Project Files' directory with the naming convention 'assessment_{type}.pdf'.
         - The method supports different types of assessments, each with specific formatting.
         - The assessment dictionary should have the structure consistent with the expected format for the given type.
         """
 
         # Create a PDF document
-        pdf_canvas = canvas.Canvas(rf"api\Files\quiz_{type}.pdf", pagesize=letter)
+        pdf_canvas = canvas.Canvas(rf"Project Files\quiz_{type}.pdf", pagesize=letter)
 
         pdf_canvas.setFont("Helvetica-Bold", 14)
         pdf_canvas.drawString(50, 770, f"{type}")
@@ -129,6 +129,7 @@ class Converter:
 
         # Save the PDF
         pdf_canvas.save()
+
 
     @staticmethod
     def quiz_answer_key(assessment, type):
