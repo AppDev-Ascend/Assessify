@@ -12,28 +12,28 @@ def register_validation(data):
     username = data['username'].strip()
     password = data['password'].strip()
 
-    try:
-        validate_email(email, "register")
-        validate_username(username)
-        validate_password(password)
-        return data
-    except ValidationError as e:
-        raise ValidationError(e.message)
+    validate_email(email, "register")
+    validate_username(username)
+    validate_password(password)
+    
+    return {
+        'email': email,
+        'username': username,
+        'password': password,
+    }
 
 
 def login_validation(data):
     email = data['email'].strip()
     password = data['password'].strip()
 
-    try:
-        validate_email(email, "login")
-        validate_password(password)
-        user = authenticate(username=email, password=password)
-        if user is None:
-            raise ValidationError("Incorrect username or password")
-        return user
-    except ValidationError as e:
-        raise ValidationError(e.message)
+    validate_email(email, "login")
+    validate_password(password)
+    
+    return {
+        'email': email,
+        'password': password
+    }
 
 
 def validate_email(email, type):
@@ -67,25 +67,15 @@ def validate_username(username):
 
 def validate_assessment(data):
     name = data['name'].strip()
-    type = data['type'].strip()
-    description = data['description'].strip()
-    lesson = data['lesson'].strip()
-    no_of_questions = data['no_of_questions']
-    learning_outcomes = data['learning_outcomes'].strip()
-    user = data['user']
+    # type = data['type'].strip()
+    # description = data['description'].strip()
+    # lesson = data['lesson'].strip()
+    # no_of_questions = data['no_of_questions']
+    # learning_outcomes = data['learning_outcomes'].strip()
 
     try:
         if Assessment.objects.filter(name=name).exists():
             raise ValidationError('Name already taken')
-        data = {
-            'name': name,
-            'type': type,
-            'description': description,
-            'lesson': lesson,
-            'no_of_questions': no_of_questions,
-            'learning_outcomes': learning_outcomes,
-            'user': user
-        }
         return data
     except ValidationError as e:
         raise ValidationError(e.message)

@@ -151,7 +151,7 @@ class Converter:
         questions = assessment.get("questions", [])
 
         # Create a PDF document for the answer key
-        pdf_canvas = canvas.Canvas(fr"api\Files\quiz_answer_key_{type}.pdf", pagesize=letter)
+        pdf_canvas = canvas.Canvas(fr"api\media\exports\quiz_answer_key_{type}.pdf", pagesize=letter)
 
         # Add content to the PDF
         pdf_canvas.setFont("Helvetica", 12)
@@ -195,7 +195,7 @@ class Converter:
         """
 
         # Create a PDF document
-        pdf_canvas = canvas.Canvas(r"api\Files\exam.pdf", pagesize=letter)
+        pdf_canvas = canvas.Canvas(r"api\media\exports\exam.pdf", pagesize=letter)
 
         # Add a header to the PDF
         pdf_canvas.setFont("Helvetica-Bold", 14)
@@ -272,7 +272,7 @@ class Converter:
         """
 
         # Create a PDF document for the answer key
-        pdf_canvas = canvas.Canvas(r"api\Files\exam_answer_key.pdf", pagesize=letter)
+        pdf_canvas = canvas.Canvas(r"api\media\exports\exam_answer_key.pdf", pagesize=letter)
 
         # Add content to the PDF
         pdf_canvas.setFont("Helvetica", 12)
