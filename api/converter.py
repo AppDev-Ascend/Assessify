@@ -50,7 +50,7 @@ class Converter:
         """
 
         # Create a PDF document
-        pdf_canvas = canvas.Canvas(rf"Project Files\quiz_{type}.pdf", pagesize=letter)
+        pdf_canvas = canvas.Canvas(rf"api\media\files\exports\quiz_{type}.pdf", pagesize=letter)
 
         pdf_canvas.setFont("Helvetica-Bold", 14)
         pdf_canvas.drawString(50, 770, f"{type}")

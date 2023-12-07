@@ -1,9 +1,9 @@
 import json
 import os
 from django.forms.models import model_to_dict
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import get_user_model, login, logout, authenticate
 from django.core.exceptions import ValidationError
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse
 from django.conf import settings
 from django.http import JsonResponse
@@ -12,12 +12,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .validations import login_validation, register_validation, validate_assessment
-from .forms import AssessmentAddForm, AssessmentQuestionForm, AssessmentOptionForm
+from .forms import RegisterForm, LoginForm, AssessmentAddForm, AssessmentQuestionForm, AssessmentOptionForm
 from .serializers import UserRegisterSerializer, UserLoginSerializer, UserSerializer, AssessmentsSerializer, AssessmentSerializer, AssessmentAddSerializer, AssessmentQuestionSerializer
 from rest_framework import permissions, status
 from .converter import Converter
 from .models import Assessment, User, Question, Option
 from .file_handler import handle_uploaded_file, handle_non_utf8
+
 
 # Notes:
 # permission_classes - specifies what kind of user can enter the view
@@ -78,18 +79,6 @@ class UserLoginView(APIView):
                 raise ValidationError("Incorrect username or password")
         except ValidationError as e:
             return JsonResponse({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
-        serializer = UserLoginSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.check_user(serializer.validated_data)
-            login(request, user)
-            return Response({
-                'user_id': user.user_id,
-                'username': user.username,
-                'email': user.email,
-                'is_authenticated': user.is_authenticated,
-            }, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Needs the logout() method to terminate the sessionid
