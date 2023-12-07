@@ -47,15 +47,6 @@ class Assessment(models.Model):
         return self.name
 
     def create_questions(self):
-        # self.name = data['name']
-        # self.type = data['type']
-        # self.description = data['description']
-        # self.lesson = data['lesson']
-        # self.no_of_questions = int(data['no_of_questions'])
-        # self.learning_outcomes = data['learning_outcomes']
-        # self.user = data['user']
-        # self.save()
-
         # API CALL
         # ai = assessment_generator.AI()
         # questions = ai.get_quiz(self.lesson, self.type, self.no_of_questions, self.learning_outcomes)

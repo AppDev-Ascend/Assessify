@@ -27,6 +27,7 @@ from .file_handler import handle_uploaded_file, handle_non_utf8
 
 class UserRegisterView(APIView):
     permission_classes = (permissions.AllowAny,)
+    authentication_classes = []
 
     # Modify for front-end here
     def get(self, request):
@@ -41,18 +42,10 @@ class UserRegisterView(APIView):
     #  "password": "pbkdf2_sha256$600000$awBXPFYxGs09qg9xAL0nTQ$uQ7+ZGbgjjlZ6FAeMFpp7AvRYEK7HwpPOuNzXjw9Ti0="}
     def post(self, request):
         try:
-            # form = RegisterForm(request.POST)
-            # if form.is_valid():
-            # validated_data = register_validation(form.cleaned_data)
-            validated_data = register_validation(request.data)
-            serializer = UserRegisterSerializer(data=validated_data)
-            if serializer.is_valid():
-                serializer.save()
-                return JsonResponse(serializer.data, status=status.HTTP_200_OK)
-            else:
-                raise ValidationError('Invalid serializer data')
-            # else:
-            #     raise ValidationError('Invalid Form Input')
+            data = request.data
+            serializer = UserRegisterSerializer(data)
+            serializer.create(data)
+            return Response(serializer.data, status.HTTP_200_OK)
         except ValidationError as e:
             return Response({'error': e.message}, status.HTTP_400_BAD_REQUEST)
 
