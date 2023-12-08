@@ -28,22 +28,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'https://main--test-assessify.netlify.app',
-    'https://fordeploy--test-assessify.netlify.app'
-]
-CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:3000'
-]
-
-CORS_ALLOW_CREDENTIALS = True
-# Set the session cookie secure flag based on your environment
-SESSION_COOKIE_SECURE = False  # Set to True in production if using HTTPS
-
-CSRF_COOKIE_SECURE = False  # Set to True in production if using HTTPS
-CSRF_COOKIE_SAMESITE = 'None'  # Allow cross-site requests in development
-
 
 # Application definition
 
@@ -54,13 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
-    'corsheaders',
     'api'
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -115,16 +96,6 @@ DATABASES = {
 # User model
 AUTH_USER_MODEL = 'api.User'
 
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
-    ),
-}
-
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -175,8 +146,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'api/media')
 MEDIA_URL = 'api/media/'
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 
-# Set the session cookie secure flag based on your environment
-SESSION_COOKIE_SECURE = False  # Set to True in production if using HTTPS
 
-CSRF_COOKIE_SECURE = False  # Set to True in production if using HTTPS
-CSRF_COOKIE_SAMESITE = 'None'  # Allow cross-site requests in development
+STATIC_URL = '/static/'
+LOGIN_URL = '/login'

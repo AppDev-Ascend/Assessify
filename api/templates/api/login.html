@@ -1,18 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-</head>
-<body>
-    <h2>Login</h2>
+{% extends 'main.html' %}
 
-    <form method="post">
-        {% csrf_token %}
-
-        {{ form.as_p }}
-
-        <button type="submit">Login</button>
-    </form>
-</body>
-</html>
+{% block content %}
+<main class="layout layout--3">
+    <main class="content-container">
+        <div class="content-left">
+        </div>
+        <div class="content-right">
+          <div class="login-container">
+            <h1 align="center"> Sign In </h1>
+            <p align="center"> Welcome back! Ready to make assessments with us? <br> It's so good to have you back for more. </p>
+            <br/>
+            <form method="post" class="navbar-searchbar">
+              {% csrf_token %}
+              <label> Email </label>
+              <input class="form-textbox" type="text" placeholder="John Doe" name="{{ form.email.name }}" size="55"> <br><br>
+              <label> Password </label>
+              <input class="form-textbox" type="password" placeholder="Enter your password." name="{{ form.password.name }}" size="55"> <br><br>
+              <br/><hr/>
+              <p align="center"> Don't have an account yet? <a href="{% url 'register' %}">Sign up for free.</a> </p>
+              <button class="generic-button" type="submit"> Sign In </button>
+            </form>
+          </div>
+        </div>
+      </main>
+</main>
+{% endblock content %}

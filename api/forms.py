@@ -6,18 +6,16 @@ from .models import User, Assessment, Question, Option
 
 
 class RegisterForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'min of 8 characters', 'label': 'Password'}))
+    re_password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Re-enter password to confirm password.'}))
+
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ['email', 'username']
         widgets = {
-            'email': forms.TextInput(attrs={'placeholder': 'johndoe@example.com',
-                                            'label': 'Email'}),
-            'username': forms.TextInput(attrs={'placeholder': 'johndoe',
-                                                'label': 'Username'}),
-            'password': forms.PasswordInput(attrs={'placeholder': 'min of 8 characters',
-                                                    'label': 'Password'})
+            'email': forms.TextInput(attrs={'placeholder': 'johndoe@example.com', 'label': 'Email'}),
+            'username': forms.TextInput(attrs={'placeholder': 'johndoe', 'label': 'Username'}),
         }
-
 
 class LoginForm(forms.ModelForm):
     class Meta:
@@ -42,7 +40,6 @@ class AssessmentAddForm(forms.Form):
                                                                      'placeholder': 'Enter learning outcomes '
                                                                                     '(separate with a comma)'}))
     
-
 class AssessmentQuestionForm(forms.ModelForm):
     class Meta:
         model = Question
