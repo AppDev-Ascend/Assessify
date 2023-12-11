@@ -1,33 +1,74 @@
-{% extends 'main.html' %}
+<!DOCTYPE html>
+<html lang=""en>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="Assessify">
+    <meta name="description" content="Assessify register page, sign up now!">
+    <meta name="author" content="Ascend">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Register | Assessify </title>
+    <link rel="icon" href="static/media/favicon.png">
+    <link rel="stylesheet" href="static/css/style-global.css">
+    <link rel="stylesheet" href="static/css/style-register-login.css">
+    <script src="static/scripts/script.js"></script>
+    <script src="static/scripts/slideshow-player.js"></script>
+  </head>
+  <body>
 
-{% block content %}
-<main class="layout layout--3">
-    <main class="content-container">
-        <div class="content-left">
-            
+    <!-- Navigation bar, can be turned into one component. -->
+    <nav class="nav-container">
+      <div class="navbar-div-left"> 
+        <a href="/index.html" class="web-logo"><div class="nav-element"><img src="static/media/BRAND_LOGO.png" height="40" alt="logo"></div></a>
+        <a href="/index.html" class="nav-interactable"><div class="nav-element"> Pricing </div></a>
+        <a href="/index.html" class="nav-interactable"><div class="nav-element"> About Us </div></a>
+      </div>
+      <div class="navbar-div-right">
+        <a href="{% url 'login' %}" class="nav-interactable"><div class="nav-element"> Sign In </div></a>
+      </div>
+    </nav>
+
+    <!-- The content box component. Contains the whole content of the page excluding the navigation bar and the footer, if there are any. -->
+    <main class="generic-content-container">
+
+        <!-- This the left div that contains the small image slideshow. -->
+        <div class="content-slideshow-container">
+            <div class="slideshow-image"><img src="static/media/slideshow-assets/image1.png"/></div>
+            <div class="slideshow-image"><img src="static/media/slideshow-assets/image2.png"/></div>
+            <div class="slideshow-image"><img src="static/media/slideshow-assets/image3.png"/></div>
         </div>
-        <div class="content-right">
-            <div class="register-container">
-              <h1 align="center"> Sign Up </h1>
-              <p align="center"> Creating an account is very simple!<br>Start working with us now! </p>
-              <form method="post" class="navbar-searchbar">
+
+        <!-- This is the right div that contains both the login and register form that can be toggled via a Javascript file. -->
+        <div class="content-form-container">
+          <div id="register-container">
+              <div class="container-header">
+                <h1> Sign Up </h1>
+                <p> Creating an account is very simple! Start using our services now! </p>
+              </div>
+
+              <form class="container-form" method="post">
                 {% csrf_token %}
-                
                 <label> Email </label>
-                <input class="form-textbox" type="text" placeholder="johndoe123@domain.com" name="{{ form.email.name }}" size="55"> <br><br>
+                <input class="generic-form-textbox" type="text" placeholder="johndoe123@domain.com" name="email">
                 <label> Username </label>
-                <input class="form-textbox" type="text" placeholder="John Doe" name="{{ form.username.name }}" size="55"> <br><br>
+                <input class="generic-form-textbox" type="text" placeholder="John Doe" name="username">
                 <label> Password </label>
-                <input class="form-textbox" type="password" placeholder="Enter your password." name="password" size="55"> <br><br>
+                <input class="generic-form-textbox" type="password" placeholder="Enter your password." name="password"> <br><br>
                 <label> Re-enter Password </label>
-                <input class="form-textbox" type="password" placeholder="Re-enter password to confirm password." name="re_password" size="55">
-                
-                <br><hr>
-                <p align="center"> By signing up to our services, you agree to our Terms of Service and Privacy Policy. </p>
-                <button class="generic-button" type="submit">Register</button>
+                <input class="generic-form-textbox" type="password" placeholder="Re-enter password to confirm password." name="repassword">
+                {{ error }}
+                <hr><br>
+                <button class="generic-button" type="submit"> Sign Up Now! </button>
               </form>
-            </div>
+
+              <div class="container-footer">
+                <p align="center"> 
+                  Already have an account? <a href="{% url 'login' %}"><b><u>Sign in to get started.</u></b></a> <br>
+                  By signing up, you agree to our <u>Terms of Service</u> and <u>Privacy Policy</u>. 
+                </p>
+              </div>
+          </div>
         </div>
-      </main>
-</main>
-{% endblock content %}
+
+    </main>
+  </body>
+</html>

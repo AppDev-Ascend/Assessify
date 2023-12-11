@@ -1,3 +1,5 @@
+from django.http import HttpResponse
+import mimetypes
 import os
 from django.conf import settings
 
@@ -6,6 +8,23 @@ def handle_uploaded_file(file):
     with open(os.path.join(settings.MEDIA_ROOT, 'files', file.name), 'wb+') as destination:
         for chunk in file.chunks():
             destination.write(chunk)
+
+def download_file(request, file_path):
+    # Build the file path
+    file_path = os.path.join(settings.MEDIA_ROOT, file_path)
+
+    # Open the file in binary mode
+    with open(file_path, 'rb') as file:
+        # Get the file's content type using mimetypes
+        content_type, _ = mimetypes.guess_type(file_path)
+        
+        # Create an HttpResponse with the file content
+        response = HttpResponse(file.read(), content_type=content_type)
+        
+        # Set the Content-Disposition header to force download
+        response['Content-Disposition'] = f'attachment; filename="{os.path.basename(file_path)}"'
+
+    return response
 
 def handle_non_utf8(text):
     try:
