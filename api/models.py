@@ -34,7 +34,7 @@ class User(AbstractBaseUser):
 class Assessment(models.Model):
     TYPE_CHOICES = [('quiz', 'Quiz'), ('exam', 'Exam')]
     id = models.AutoField(primary_key=True, null=False)
-    name = models.CharField(max_length=128, null=False, unique=True)
+    name = models.CharField(max_length=128, null=False)
     type = models.CharField(max_length=50, choices=TYPE_CHOICES, null=False)
     description = models.TextField()
     lesson = models.TextField()
@@ -45,10 +45,20 @@ class Assessment(models.Model):
     def __str__(self):
         return self.name
 
-    def create_quiz(self, q_type, l_outcomes):
+    def create_quiz(self, section):
+        # section consists of:
+        # ['section_types'] = list i.e. ['multiple choice']
+        # ['section_lengths'] = list i.e. [5]
+        # ['learning_outcomes'] = list i.e. ['l_outcome 1.1', 'l_outcome 1.2', 'l_outcome 1.3']
+        print(section)
+        
+        s_type = section['section_types'][0]
+        s_length = section['section_lengths'][0]
+        l_outcomes = section['learning_outcomes']
+        
         # API CALL
         # ai = assessment_generator.AI()
-        # questions = ai.get_quiz(self.lesson, type, self.no_of_questions, self.learning_outcomes)
+        # questions = ai.get_quiz(self.lesson, s_type, s_length, l_outcomes)
 
         # SAMPLE API CALL RESULT
         quiz = {"type": "Multiple Choice",
@@ -107,11 +117,13 @@ class Assessment(models.Model):
                          ]
                      }
         
-        qt = Question_Type.objects.get(name=q_type)
+        qt = Question_Type.objects.get(type=s_type)
         questions_list = {'questions': quiz['questions']}
+        
         s = Section.objects.create(
             section_no=1, 
-            type=q_type[0], 
+            length=s_length,
+            type=qt, 
             assessment=self
         )
         for l in l_outcomes:
@@ -119,28 +131,38 @@ class Assessment(models.Model):
                 learning_outcome=l, 
                 section=s
             )
-        for i, q in enumerate(questions_list['questions']):
+        for i, q in enumerate(questions_list['questions'], start=1):
             question = Question.objects.create(
-                question_no=i + 1,
+                question_no=i,
                 question=q['question'],
                 answer=q['answer'],
                 section=s
             )
-            if qt.name == 'multiple choice' or qt.name == 'true or false':
+            if qt.type == 'multiple choice' or qt.type == 'true or false':
                 options_list = q['options']
-                for j, o in enumerate(options_list):
+                for j, o in enumerate(options_list, start=1):
                     option = Option.objects.create(
-                        option_no=j + 1,
+                        option_no=j,
                         option=o,
                         question=question
                 )
 
         return self
     
-    def create_exam(self, q_type, l_outcomes):
+    def create_exam(self, section):
+        # section consists of:
+        # ['section_types'] = list i.e. ['multiple choice', 'true or false', 'essay']
+        # ['section_lengths'] = list i.e. [5, 10, 15,]
+        # ['learning_outcomes'] = list i.e. [['l_outcome 1.1', 'l_outcome 1.2',], ['l_outcome 2.1', 'l_outcome 2.2']]
+        print(section)
+        
+        s_types = section['section_types']
+        s_lengths = section['section_lengths']
+        l_outcomes = section['learning_outcomes']
+        
         # API CALL
         # ai = assessment_generator.AI()
-        # questions = ai.get_exam(self.lesson, type, self.no_of_questions, self.learning_outcomes)
+        # questions = ai.get_exam(self.lesson, s_type, s_lengths, l_outcomes)
         
         # SAMPLE API CALL RESULT
         exam = {
@@ -164,7 +186,7 @@ class Assessment(models.Model):
                             "question": "What is a benefit of using the Prototype Design Pattern?",
                             "options": [
                                 "It allows for the creation of new game characters",
-                                "It saves time and resources in generating similar UI elements",
+                                " It saves time and resources in generating similar UI elements",
                                 "It provides a clear and complete documentation of prototype objects",
                                 "It ensures consistent behavior and initial states of cloned objects"
                             ],
@@ -187,53 +209,64 @@ class Assessment(models.Model):
                     ]
                 },
                 {
-                    "section_name": "Test 2",
+                    "section_name": "Test 3",
                     "section_type": "Essay",
                     "questions": [
                         {
-                            "question": "1. Explain the concept of the Prototype Design Pattern and how it is used in software development. What are the key characteristics of this pattern?"
+                            "question": "Explain the concept of the Prototype Design Pattern and how it is used in software development. What are the key characteristics of this pattern?"
                         },
                         {
-                            "question": "2. Discuss the benefits of using the Prototype Design Pattern in game development. How does it help in creating new game characters with different attributes?"
+                            "question": "Discuss the benefits of using the Prototype Design Pattern in game development. How does it help in creating new game characters with different attributes?"
                         },
                         {
-                            "question": "3. Describe a real-world example where the Prototype Design Pattern can be applied in graphical user interfaces. How does it save time and resources when generating similar UI elements?"
+                            "question": "Describe a real-world example where the Prototype Design Pattern can be applied in graphical user interfaces. How does it save time and resources when generating similar UI elements?"
                         },
                         {
-                            "question": "4. Discuss the drawbacks or limitations of using the Prototype Design Pattern in database operations. When might it not be suitable for cloning database records?"
+                            "question": "Discuss the drawbacks or limitations of using the Prototype Design Pattern in database operations. When might it not be suitable for cloning database records?"
                         },
                         {
-                            "question": "5. Explain the importance of maintaining consistency when using the Prototype Design Pattern. How can it ensure that all cloned objects derived from the same prototype exhibit consistent behavior and initial states?"
+                            "question": "Explain the importance of maintaining consistency when using the Prototype Design Pattern. How can it ensure that all cloned objects derived from the same prototype exhibit consistent behavior and initial states?"
                         }
                     ]
                 }
             ]
         }
         
-        qt = Question_Type.objects.get(name=q_type)
         section_list = {'sections': exam['sections']}
         
-        for l in l_outcomes:
-            Learning_Outcomes.objects.create(
-                learning_outcome=l, 
-                section=s
-            )
             
-        for i, s in enumerate(section_list['sections'], start=1):
-            s = Section.objects.create(
+        for i, (s, s_l, l) in enumerate(zip(section_list['sections'], s_lengths, l_outcomes), start=1):
+            s_type = s['section_type'].lower()
+            print(f's_type: {s_type}')
+            s_t = Question_Type.objects.get(type=s_type)
+            sec = Section.objects.create(
                 section_no=i, 
                 name=s['section_name'],
-                type=s['section_type'], 
+                length=s_l,
+                type=s_t, 
                 assessment=self
             )
-            for j, q in enumerate(s ['questions'], start=1):
+            for lo in l:
+                Learning_Outcomes.objects.create(
+                    learning_outcome=lo, 
+                    section=sec
+                )
+            for j, q in enumerate(s['questions'], start=1):
+                
+                if s_type == 'essay':
+                    answer = ''
+                else:
+                    answer = q['answer']
+                    
                 question = Question.objects.create(
                     question_no=j,
                     question=q['question'],
-                    answer=q['answer'],
-                    section=s
+                    answer=answer,
+                    section=sec
                 )
-                if qt.name == 'multiple choice' or qt.name == 'true or false':
+                # when true or false includes options
+                # if s_type == 'multiple choice' or s_type == 'true or false': 
+                if s_type == 'multiple choice':
                     options_list = q['options']
                     for k, o in enumerate(options_list, start=1):
                         option = Option.objects.create(
@@ -243,36 +276,37 @@ class Assessment(models.Model):
                     )
         
 class Question_Type(models.Model):
-    name = models.CharField(max_length=20, unique=True)
+    type = models.CharField(max_length=20, unique=True)
     
     def __str__(self):
-        return self.name
+        return self.type
 
 class Section(models.Model):
     section_no = models.IntegerField(null=False)
     name = models.CharField(max_length= 64)
+    description = models.CharField(max_length= 64)
+    length = models.IntegerField(null=False)
     type = models.ForeignKey(Question_Type, on_delete=models.CASCADE)
     assessment = models.ForeignKey(Assessment, on_delete=models.CASCADE, null=False)
     
     def __str__(self):
-        return f'Section {self.section_no} of assessment-{self.assessment.pk}'
+        return f'{self.pk}-{self.name}'
 
 class Learning_Outcomes(models.Model):
     learning_outcome = models.CharField(max_length=256, null=False)
     section = models.ForeignKey(Section, on_delete=models.CASCADE, null=False)
 
     def __str__(self):
-        return f'{self.learning_outcome} for section {self.section.pk}'
+        return self.learning_outcome
 
 class Question(models.Model):
     question_no = models.IntegerField(null=False)
     question = models.TextField(null=False)
-    answer = models.TextField(null=False)
+    answer = models.TextField()
     section = models.ForeignKey(Section, on_delete=models.CASCADE, null=False)
 
     def __str__(self):
         return self.question
-
 
 class Option(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, null=False)

@@ -32,7 +32,11 @@ class Converter:
             text += pytesseract.image_to_string(img, lang='eng')
 
         return text
-
+    
+    # If ever custom file naming convention is necessary
+    # added username assessment id, and assessment_name for the file name to avoid errors
+    # file naming convention: {assessment_name}_quiz_{username}-{assessment_id}.pdf
+    # def quiz_to_pdf(assessment, username, assessment_id, assessment_name, type):
     @staticmethod
     def quiz_to_pdf(assessment, type, name):
         """
@@ -44,18 +48,18 @@ class Converter:
 
         Note:
         - This method creates a PDF document with formatted content based on the quiz assessment.
-        - The PDF is saved to the 'Project Files' directory with the naming convention 'assessment_{type}.pdf'.
+        - The PDF is saved to the 'Project Files' directory with the naming convention '{name}_quiz.pdf'.
         - The method supports different types of assessments, each with specific formatting.
         - The assessment dictionary should have the structure consistent with the expected format for the given type.
         """
 
         # Create a PDF document
-        pdf_canvas = canvas.Canvas(rf"api\media\files\exports\quiz_{name}.pdf", pagesize=letter)
+        pdf_canvas = canvas.Canvas(rf"api\media\files\exports\{name}_quiz.pdf", pagesize=letter)
 
         pdf_canvas.setFont("Helvetica-Bold", 14)
         pdf_canvas.drawString(50, 770, f"{type}")
         pdf_canvas.setFont("Helvetica", 12)
-
+        
         # Extract information from the JSON
         questions = assessment.get("questions", [])
 
@@ -72,7 +76,7 @@ class Converter:
 
             question_text = question.get("question", "")
 
-            if type == "multiple choice":
+            if type == "Multiple Choice":
                 options = question.get("options", [])
                 pdf_canvas.drawString(x_position, y_position, f"{index}. {question_text}")
 
@@ -88,7 +92,7 @@ class Converter:
                             pdf_canvas.drawString(x_position + 28, y_position - 2, wrapped_option_line)
                         y_position -= line_height
 
-            elif type == "identification":
+            elif type == "Identification":
                 wrapped_text_lines = Converter.wrap_text(f"{index}. {question_text}", max_line_length)
                 for i, wrapped_text_line in enumerate(wrapped_text_lines):
                     if i == 0:
@@ -97,7 +101,7 @@ class Converter:
                         pdf_canvas.drawString(x_position + 15, y_position, wrapped_text_line)
                     y_position -= line_height
 
-            elif type == "true or false":
+            elif type == "True or False":
                 wrapped_text_lines = Converter.wrap_text(f"{index}. {question_text}", max_line_length)
                 for i, wrapped_text_line in enumerate(wrapped_text_lines):
                     if i == 0:
@@ -106,7 +110,7 @@ class Converter:
                         pdf_canvas.drawString(x_position + 15, y_position, wrapped_text_line)
                     y_position -= line_height
 
-            elif type == "fill in the blanks":
+            elif type == "Fill in the Blanks":
                 lines = Converter.wrap_text(f"{index}. {question_text}", max_line_length)
                 for i, line in enumerate(lines):
                     if i == 0:
@@ -115,7 +119,7 @@ class Converter:
                         pdf_canvas.drawString(x_position + 15, y_position-5, line)
                     y_position -= line_height
 
-            elif type == "essay":
+            elif type == "Essay":
                 lines = Converter.wrap_text(f"{index}. {question_text}", max_line_length)
                 for i, line in enumerate(lines):
                     if i == 0:
@@ -128,7 +132,11 @@ class Converter:
 
         # Save the PDF
         pdf_canvas.save()
-
+    
+    # If ever custom file naming convention is necessary
+    # added username assessment id, and assessment_name for the file name to avoid errors
+    # file naming convention: {assessment_name}_quiz-answer-key_{username}-{assessment_id}.pdf
+    # def quiz_answer_key(assessment, username, assessment_id, assessment_name, type):
     @staticmethod
     def quiz_answer_key(assessment, type, name):
         """
@@ -140,7 +148,7 @@ class Converter:
 
         Note:
         - This method creates an answer key PDF document with correct answers for the quiz assessment.
-        - The PDF is saved to the 'Files' directory with the naming convention 'answer_key_{type}.pdf'.
+        - The PDF is saved to the 'Files' directory with the naming convention '{name}_quiz_answer-key.pdf'.
         - The method supports different types of assessments, each with specific formatting for correct answers.
         - The assessment dictionary should have the structure consistent with the expected format for the given type.
         """
@@ -149,26 +157,28 @@ class Converter:
         questions = assessment.get("questions", [])
 
         # Create a PDF document for the answer key
-        pdf_canvas = canvas.Canvas(fr"api\media\files\exports\quiz_answer_key_{name}.pdf", pagesize=letter)
+        pdf_canvas = canvas.Canvas(rf"api\media\files\exports\{name}_quiz_answer-key.pdf", pagesize=letter)
 
         # Add content to the PDF
         pdf_canvas.setFont("Helvetica", 12)
 
-        
-
         y_position = 780
         for index, question in enumerate(questions, start=1):
             y_position -= 15  # Adjust the vertical position for each question
+            
+            correct_answer = f"Question {index}: {question['answer']}"
 
-            if type == "multiple choice":
-                correct_answer = f"Question {index}: {question['answer']}"
-            elif type == "identification":
-                correct_answer = f"Question {index}: {question['answer']}"
-            elif type == "true or false":
-                correct_answer = f"Question {index}: {'True' if question['answer'] else 'False'}"
-            elif type == "fill in the blanks":
-                correct_answer = f"Question {index}: {question['answer']}"
+            # this seems redundant
+            # if type == "multiple choice":
+            #     correct_answer = f"Question {index}: {question['answer']}"
+            # elif type == "identification":
+            #     correct_answer = f"Question {index}: {question['answer']}"
+            # elif type == "true or false":
+            #     correct_answer = f"Question {index}: {question['answer']}"
+            # elif type == "fill in the blanks":
+            #     correct_answer = f"Question {index}: {question['answer']}"
 
+            print(correct_answer)
             pdf_canvas.drawString(120, y_position, correct_answer)
 
             y_position -= 25  # Adjust the vertical position for the next question
@@ -176,8 +186,12 @@ class Converter:
         # Save the PDF
         pdf_canvas.save()
 
+    # If ever custom file naming convention is necessary
+    # added username assessment id, and assessment_name for the file name to avoid errors
+    # file naming convention: {assessment_name}_exam_{username}-{assessment_id}.pdf
+    # def exam_to_pdf(exam, username, assessment_id, assessment_name):
     @staticmethod
-    def exam_to_pdf(exam):
+    def exam_to_pdf(exam, name):
         """
         Convert an exam assessment in JSON format to a PDF document.
 
@@ -193,14 +207,14 @@ class Converter:
         """
 
         # Create a PDF document
-        pdf_canvas = canvas.Canvas(r"api\media\files\exports\exam.pdf", pagesize=letter)
+        pdf_canvas = canvas.Canvas(rf"api\media\files\exports\{name}_exam.pdf", pagesize=letter)
 
         # Add a header to the PDF
         pdf_canvas.setFont("Helvetica-Bold", 14)
         pdf_canvas.drawString(50, 770, "Exam")
         pdf_canvas.setFont("Helvetica", 12)
 
-        y_position = 750
+        y_position = 730
         x_position = 50
         line_height = 10
         max_line_length = 80
@@ -209,11 +223,15 @@ class Converter:
         for section in exam["sections"]:
             # Add section name to the PDF
             pdf_canvas.setFont("Helvetica-Bold", 12)
+            pdf_canvas.drawString(x_position, y_position, section["section_name"])
+            y_position -= line_height + 10  # Adjust the vertical position for the section name
             pdf_canvas.drawString(x_position, y_position, section["section_type"])
             pdf_canvas.setFont("Helvetica", 12)
-            y_position -= line_height  # Adjust the vertical position for the section name
+            y_position -= line_height + 10  # Adjust the vertical position for the section name
+            pdf_canvas.drawString(x_position, y_position, section["section_description"])
+            y_position -= line_height # Adjust the vertical position for the section name
 
-            questions = section["questions"]["questions"]
+            questions = section["questions"]
             for index, question in enumerate(questions, start=1):
                 y_position -= line_height  # Adjust the vertical position for each question
 
@@ -233,27 +251,31 @@ class Converter:
                     options = question.get("options", [])
                     for option_index, option in enumerate(options, start=1):
                         y_position -= line_height  # Adjust the vertical position for each option
-                        wrapped_option_lines = Converter.wrap_text(f"{option}", max_line_length)
+                        wrapped_option_lines = Converter.wrap_text(f"{chr(96 + option_index)}. {option}", max_line_length)
                         for i, wrapped_option_line in enumerate(wrapped_option_lines):
                             if i == 0:
                                 y_position -= line_height
                             pdf_canvas.drawString(x_position + 15, y_position, wrapped_option_line)
                             y_position -= line_height
 
-                y_position -= line_height  # Adjust the vertical position for the next question
+                y_position -= line_height # Adjust the vertical position for the next question
 
                 # Check if y_position exceeds the y_limit, add a new page if needed
                 if y_position < y_limit:
                     pdf_canvas.showPage()
                     y_position = 750  # Reset y_position for the new page
 
-            y_position -= line_height # Adjust the vertical position for the next section
+            y_position -= line_height + 10 # Adjust the vertical position for the next section
 
         # Save the PDF
         pdf_canvas.save()
 
+    # If ever custom file naming convention is necessary
+    # added username assessment id, and assessment_name for the file name to avoid errors
+    # file naming convention: {assessment_name}_exam-answer-key_{username}-{assessment_id}.pdf
+    # def exam_answer_key(exam, username, assessment_id, assessment_name):
     @staticmethod
-    def exam_answer_key(exam):
+    def exam_answer_key(exam, name):
 
         """
         Generate an answer key PDF for an exam assessment.
@@ -263,19 +285,22 @@ class Converter:
 
         Note:
         - This method creates an answer key PDF document with correct answers for the exam assessment.
-        - The PDF is saved to the 'Project Files' directory with the naming convention 'exam_answer_key.pdf'.
+        - The PDF is saved to the 'Project Files' directory with the naming convention '{name}_exam-answer-key.pdf'.
         - The method supports different types of exam sections, each with specific formatting for correct answers.
         - The exam dictionary should have the structure consistent with the expected format.
         - If the vertical position (y_position) exceeds the y_limit, a new page is added.
         """
+        #           ! SUGGESTIONS !
+        # Can try to add section name and description ?
+        # exam['name'] and exam['description'] 
 
         # Create a PDF document for the answer key
-        pdf_canvas = canvas.Canvas(r"api\media\files\exports\exam_answer_key.pdf", pagesize=letter)
+        pdf_canvas = canvas.Canvas(rf"api\media\files\exports\{name}_exam_answer-key.pdf", pagesize=letter)
 
         # Add content to the PDF
         pdf_canvas.setFont("Helvetica", 12)
         max_line_length = 80  # Adjusted maximum line length
-        y_position = 780
+        y_position = 760
         y_limit = 100  # Set the y_limit
         line_height = 10  # Set the line height
         x_position = 80  # Adjusted starting position on the x-axis
@@ -288,7 +313,7 @@ class Converter:
             pdf_canvas.setFont("Helvetica", 12)
             y_position -= line_height  # Adjust the vertical position for the section name
 
-            questions = section["questions"]["questions"]
+            questions = section["questions"]
             for index, question in enumerate(questions, start=1):
                 y_position -= 2 * line_height  # Adjust the vertical position for each question
 
@@ -298,7 +323,7 @@ class Converter:
                     y_position = 780  # Reset y_position for the new page
 
                 if section["section_type"] == "Multiple Choice":
-                    correct_answer = f"Question {index}: {chr(97 + question['answer'])}"
+                    correct_answer = f"Question {index}: {question['answer']}"
                 elif section["section_type"] == "Identification":
                     correct_answer = f"Question {index}: {question['answer']}"
                 elif section["section_type"] == "True or False":
@@ -344,7 +369,7 @@ class Converter:
         return lines
 
     @staticmethod
-    def quiz_to_gift(json_data):
+    def quiz_to_gift(json_data, name):
         """
         Convert a quiz assessment in JSON format to a GIFT (General Import Format Template) file.
 
@@ -397,11 +422,11 @@ class Converter:
                 gift_string += f"::Question::{question_text}?\n"
 
         # Save the GIFT content to the specified output file
-        with open(r"api\media\files\exports\quiz_gift.txt", "w") as file:
+        with open(rf"api\media\files\exports\{name}_quiz-gift.txt", "w") as file:
             file.write(gift_string)
 
     @staticmethod
-    def exam_to_gift(exam, output_file):
+    def exam_to_gift(exam, output_file, name):
         """
         Convert an exam assessment in JSON format to a GIFT (General Import Format Template) file.
         
@@ -459,7 +484,7 @@ class Converter:
                     gift_string += f"::Question::{question_text}?\n"
 
         # Save the GIFT content to the specified output file
-        with open(r"api\media\files\exports\exam_gift.txt", "w") as file:
+        with open(rf"api\media\files\exports\{name}_exam-gift.txt", "w") as file:
             file.write(gift_string)
 
         return gift_string

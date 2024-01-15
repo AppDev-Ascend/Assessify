@@ -116,7 +116,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'api.backends.CustomEmailBackend',
+    'api.backends.CustomLoginBackend',
 ]
 
 # Internationalization
@@ -147,5 +147,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'api/media')
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 
 
-STATIC_URL = '/static/'
 LOGIN_URL = '/login'
