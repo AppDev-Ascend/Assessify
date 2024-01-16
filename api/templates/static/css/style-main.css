@@ -1,0 +1,243 @@
+@font-face {
+    font-family: LGCafe;
+    src: url(../media/fonts/louis_george_cafe.ttf) format("truetype");
+}
+@font-face {
+    font-family: Signika;
+    src: url(../media/fonts/signika.ttf) format("truetype");
+}
+@font-face {
+    font-family: Raleway;
+    src: url(../media/fonts/raleway.ttf) format("truetype");
+}
+
+body {
+    margin: 0px;
+    padding: 0px;
+    height: 100%;
+    width: 100%;
+    background-color: rgb(250, 250, 255);
+}
+
+.nav-container {
+    top: 0;
+    width: 100%;
+    height: 58px;
+    min-height: 56px;
+    max-height: 70px;
+    display: flex;
+    position: fixed;
+    z-index: 1;
+    font-family: 'Signika';
+    background-color: rgb(255, 255, 255);
+    border-bottom: 2px solid rgb(206, 206, 206);
+    box-shadow: 0px 0px 10px 10px rgba(0, 0, 0, 0.05);
+}
+nav .navbar-div-left {
+    width: 50%;
+    padding-left: 25px;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+nav .navbar-div-right {
+    width: 50%;
+    padding-right: 25px;
+    display: flex;
+    justify-content: right;
+    align-items: center;
+}
+nav .nav-element {
+    padding: 15px 25px 15px 25px;
+    display: flex;
+    align-items: center;
+    color: black;
+    font-size: 22px;
+    font-weight: 550;
+}
+nav .nav-interactable:link, .nav-interactable:active {
+    text-decoration: none;
+}
+nav .nav-interactable:hover {
+    border-bottom: 3px rgb(59, 255, 75) solid;
+    transition: .2s;
+}
+
+.content-container {
+    margin-top: 60px;
+    display: flex;
+    font-family: 'Raleway';
+}
+.content-container h1 {
+    font-size: 64px;
+    line-height: 10px;
+    margin-top: 0px;
+    font-weight: bolder;
+}
+.content-container h3 {
+    line-height: 0px;
+}
+.generic-button {
+    width: 100%;
+    padding: 15px 20px 15px 20px;
+    font-family: Segoe UI;
+    text-align: center;
+    background-color: transparent;
+    color: rgb(255, 255, 255);
+    text-decoration: none;
+    background-color: rgb(2, 158, 15);
+    border: none;
+    outline: none;
+    border-radius: 20px;
+    transition: .3s;
+    cursor: pointer;
+}
+.generic-button:hover {
+    background-color: rgb(4, 192, 20);
+}
+.generic-button:active {
+    background-color: rgb(3, 240, 23);
+}
+main .content-left {
+    width: 65%;
+    height: 92.3vh;      /* hardcoded value = evil, change it asap, fixable with js only */
+    background-image: url("../media/placeholder.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    animation: fade 5s ease-in-out infinite;
+}
+main .content-right {
+    width: 35%;
+    display: flex;
+    align-items: center;
+}
+main .content-right .register-container {
+    display: none;
+    padding: 60px;
+}
+main .content-right .login-container {
+    /*display: none;*/
+    padding: 60px;
+}
+input.form-textbox {
+    padding: 9px;
+    border: 1px gray solid;
+    border-radius: 10px;
+}
+input.form-textbox:focus {
+    outline: none;
+    border: 2px solid green;
+}
+label {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.generic-content-container {
+    padding: 75px 125px 75px 125px;
+    font-family: 'Raleway';
+}
+.generic-content-container h1 {
+    font-size: 64px;
+    line-height: 10px;
+    font-weight: bolder;
+}
+.assessment-grid-container {
+    width: 100%;
+    display: grid;
+    grid-column-gap: 30px;
+    grid-row-gap: 30px;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+.assessment-box {
+    display: inline-block;
+    width: 100%;
+    height: 300px;
+    max-width: 100%;
+    max-height: 300px;
+    padding: 25px;
+    border: 1px solid rgb(201, 201, 201);
+    background-color: rgb(255, 255, 255);
+    border-radius: 20px;
+    box-sizing: border-box;
+    transition: transform .2s;
+    box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.05);
+}
+.assessment-box:hover {
+    transform: scale(1.035);
+}
+.assessment-create-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+    width: 100%;
+    height: 300px;
+    max-width: 100%;
+    max-height: 300px;
+    padding: 25px;
+    border: 1px dashed rgb(58, 58, 58);
+    border-radius: 20px;
+    box-sizing: border-box;
+    transition: .2s;
+    box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.05);
+}
+.assessment-create-box:hover {
+    background-color: rgb(255, 255, 255);
+    border: 2px solid greenyellow;
+}
+
+.assessment-creator-container {
+    width: 100%;
+    display: grid;
+    box-sizing: border-box;
+    grid-column-gap: 50px;
+    grid-template-columns: 0.65fr 0.35fr;
+}
+.assessment-attributes-form {
+    width: 100%;
+    height: 100%;;
+    box-sizing: border-box;
+}
+.assessment-generator-form {
+    box-sizing: border-box;
+}
+
+.generic-textbox {
+    width: 100%;
+    padding: 5px;
+    box-sizing: border-box;
+}
+.generic-textarea-variant1 {
+    width: 100%;
+    padding: 5px;
+    resize: none;
+    box-sizing: border-box;
+}
+.generic-textarea-variant2 {
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid rgb(230, 230, 230);
+    box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.05);
+    font-family: 'Segoe UI';
+    resize: none;
+    box-sizing: border-box;
+}
+.generic-textarea-variant1:focus {
+    outline: none;
+}
+.generic-textarea-variant2:focus {
+    outline: none;
+}
+
+@keyframes fade {
+    0%, 100% {
+      opacity: 0;
+    }
+    25%, 75% {
+      opacity: 1;
+    }
+}

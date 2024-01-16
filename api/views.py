@@ -114,13 +114,11 @@ class CreateAssessmentView(View):
     
     def get(self, request):
         a_type = request.GET.get('type')
-        print(a_type)
         return render(request, self.template)
 
     def post(self, request):
         user_id = request.session['_auth_user_id']
         user = User.objects.get(pk=user_id)
-        print(f'user: {user_id}')
         
         # for assessment creation
         assessment_name = request.POST.get('assessment_name')
@@ -134,12 +132,9 @@ class CreateAssessmentView(View):
         section_types = []
         section_lengths = []
         learning_outcomes = []
-        # no_of_sections = 0
         
         if assessment_type == 'quiz':
-            # no_of_sections = 1
             for key, value in request.POST.items():
-                print(f'KEY: {key}, VALUE: {value}')
                 
                 if key.startswith('section-type'):
                     section_types.append(value.lower().lstrip())
@@ -155,11 +150,8 @@ class CreateAssessmentView(View):
         elif assessment_type == 'exam':
             s = []
             for key, value in request.POST.items():
-                print(f'key: {key}')
-                print(f'value: {value}')
                 
                 if key.startswith('section-type'):
-                    # no_of_sections += 1
                     s = []
                     section_types.append(value.lower().lstrip())
                 
@@ -172,10 +164,6 @@ class CreateAssessmentView(View):
                     if not s:
                         learning_outcomes.append(s)
                     s.append(value)
-            
-            print(f's_types: {section_types}')
-            print(f's_lengths: {section_lengths}')
-            print(f'l_outcomes: {learning_outcomes}')
                             
         if 'lesson_file' in request.FILES:
             file = request.FILES['lesson_file']
@@ -187,9 +175,6 @@ class CreateAssessmentView(View):
             # pdf to text convert
             if file_format == 'pdf':
                 lesson = Converter.pdf_to_text(path)
-            
-        else:
-            print('no file')
 
         # assign the necessary values to the section dictionary
         section['section_types'] = section_types
@@ -202,7 +187,6 @@ class CreateAssessmentView(View):
                                                lesson=lesson,
                                                no_of_questions=no_of_questions,
                                                user=user)
-        print(f'assessment_id: {assessment.pk}')
         
         if assessment_type == 'quiz':
             assessment.create_quiz(section)
@@ -252,8 +236,6 @@ class ViewAssessmentView(View):
                 temp_question_group = QuestionGroup()
                 temp_question_group.question = q
                 temp_question_group.options = options
-                print(f'question: {q}')
-                print(f'answer: {q.answer}')
                 q_list.append(temp_question_group)    
                 
             question_group.append(q_list)  
@@ -273,8 +255,6 @@ class ViewAssessmentView(View):
     def post(self, request):
         assessment_id = request.GET.get('as')
         for key, value in request.POST.items():
-            print(f'key: {key}')
-            print(f'value: {value}')
             k = key.split('_')
             
             if k[0] == 'assessmentname':
@@ -352,8 +332,8 @@ class AssessmentExportView(View):
                 
             question_dict['questions'] = question_data_list
             
-            with open('question_dict.json', 'w') as f:
-                json.dump(question_dict, f)
+            # with open('question_dict.json', 'w') as f:
+            #     json.dump(question_dict, f)
             
             if file_format == 'pdf':
                 Converter.quiz_to_pdf(assessment=question_dict, type=type, name=assessment.name)
@@ -408,7 +388,6 @@ class AssessmentExportView(View):
                 section_list.append(section_data)
 
             exam_dict['sections'] = section_list
-            print(exam_dict)
             
             with open('exam_dict.json', 'w') as f:
                 json.dump(exam_dict, f)

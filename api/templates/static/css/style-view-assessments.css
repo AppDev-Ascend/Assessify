@@ -1,0 +1,26 @@
+.generic-content-container {
+    padding: 50px 125px 10px 125px;
+    font-family: 'Raleway';
+}
+.content-grid {
+    width: 100%;
+    display: grid;
+    box-sizing: border-box;
+    grid-column-gap: 50px;
+    grid-template-columns: 0.70fr 0.30fr;
+}
+
+.assessment-section h2 {
+    font-size: 42px;
+    margin-bottom: 5px;
+}
+.assessment-section li {
+    font-size: 20px;
+}
+.assessment-section li.item {
+    margin: 30px 0px 30px 0px;
+    font-size: 20px;
+}
+.assessment-section .options li {
+    margin: 10px 0px 10px 0px;
+}

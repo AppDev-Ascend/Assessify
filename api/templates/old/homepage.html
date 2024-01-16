@@ -1,0 +1,31 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block content %}
+<main class="generic-content-container">
+    <br/><br/><br/>
+    <h1> My Assessments </h1>
+    <p> Welcome back, John Doe! Here are the assessments you have created since you've joined us! </p> <br/><br/>
+    <div class="assessment-grid-container">
+        <form method="post">
+        {% for assessment in assessments %}
+            <a href="{% url 'assessment' %}?as={{ assessment.name }}&act=view">
+            <div class="assessment-box">
+                <div class="assessment-description">
+                    <h2> {{ assessment.name }} </h2>
+                    <p> {{ assessment.type }} | {{ assessment.no_of_questions }} </p>
+                    <p> {{ assessment.description }} </p>
+                </div>
+            </div>
+            </a>
+        {% endfor %}
+        </form>
+      <a href="{% url 'assessment_type' %}">
+        <div class="assessment-create-box">
+            <img src="{% static 'images/add.png' %}" height="150" width="165" alt='add button'/>
+            <h2> Create New <br/> Assessment </h2>
+        </div>
+      </a>
+    </div>
+</main>
+{% endblock %}
