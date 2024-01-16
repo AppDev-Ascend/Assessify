@@ -564,13 +564,15 @@ class Converter:
 
     @staticmethod
     def exam_to_docx(exam, name, username):
+
         document = Document()
 
         document.add_heading(exam["type"], level=1)
 
         for section in exam["sections"]:
-            section_name = section.get("name", "")
-            section_type = section.get("type", "")
+            print(section)
+            section_name = section.get("section_name", "") or section.get("name", "")
+            section_type = section.get("section_type", "") or section.get("type", "")
             document.add_heading(f"{section_name} - {section_type}", level=2)
 
             for i, question_data in enumerate(section["questions"], start=1):
@@ -578,6 +580,7 @@ class Converter:
                 document.add_paragraph(question_text, style="Heading 2")
 
                 if section_type.lower() == "multiple choice":
+                    print("Multiple Choice Questions \n\n")
                     for j, option in enumerate(question_data["options"], start=1):
                         option_text = f"  {chr(64 + j)}. {option}"
                         document.add_paragraph(option_text)
@@ -590,23 +593,24 @@ class Converter:
         # Add answers
         document.add_heading("Answer Key", level=1)
         for section in exam["sections"]:
-            section_name = section.get("name", "")
-            section_type = section.get("type", "")
+            section_name = section.get("name", "") or section.get("section_name", "")
+            section_type = section.get("type", "") or section.get("section_type", "")
             
-            if section_type.lower() != "essay":
+            if section_type.lower() != "essay":    
+                
                 document.add_heading(f"{section_name} - {section_type}", level=2)
 
                 if section_type.lower() == "multiple choice":
                     for i, answer_data in enumerate(section["questions"], start=1):
-                        answer_index = answer_data["answer"] - 1
-                        correct_answer = answer_data["options"][answer_index]
-                        answer_text = f"{i}: {chr(65 + answer_index)}. {correct_answer}"
+                        correct_answer = answer_data["answer"]
+                        answer_text = f"{i}: {correct_answer}"
                         document.add_paragraph(answer_text, style="Body Text")
                 else:
                     for i, answer_data in enumerate(section["questions"], start=1):
                         question_text = f"{i}. {answer_data['answer']}"
                         document.add_paragraph(question_text, style="Body Text")
 
+        print('Here')
         # Save the document
-        file_path = fr'media\{username}\{name}_exam.docx'
+        file_path = fr'api\media\{username}\exports\{name}_exam.docx'
         document.save(file_path)

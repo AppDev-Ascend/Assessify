@@ -1,1 +1,0 @@
-What type of design pattern is the Flyweight Pattern considered to be?

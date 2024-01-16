@@ -391,7 +391,7 @@ class AssessmentExportView(View):
                         question_data['options'] = options
                         print(q.answer)
                         option_answer = Option.objects.get(question=q, option_no=q.answer)
-                        question_data['answer'] = f'{chr(96 + option_answer.option_no)}. {option_answer}'
+                        question_data['answer'] = f'{chr(97 + option_answer.option_no)}. {option_answer}'
                         
                     question_data_list.append(question_data)   
                 
@@ -402,8 +402,8 @@ class AssessmentExportView(View):
             
             
             if file_format == 'pdf':
-                Converter.exam_to_pdf(exam=exam_dict, name=assessment.name)
-                Converter.exam_answer_key(exam=exam_dict, name=assessment.name)
+                Converter.exam_to_pdf(exam=exam_dict, name=assessment.name, username=username)
+                Converter.exam_answer_key(exam=exam_dict, name=assessment.name, username=username)
                 """
                 if there is custom file naming convention
                 Converter.exam_to_pdf(exam=exam_dict, 
@@ -416,29 +416,15 @@ class AssessmentExportView(View):
                                           assessment_name=assessment.name)
                 """
             elif file_format == 'gift':
-                Converter.exam_to_gift(exam=exam_dict, output_file=None, name=assessment.name)
+                Converter.exam_to_gift(exam=exam_dict, name=assessment.name, username=username)
 
             if file_format == 'pdf':
                 Converter.exam_to_pdf(exam=exam_dict, name=assessment.name, username=username)
                 Converter.exam_answer_key(exam=exam_dict, name=assessment.name, username=username)
-                """
-                if there is a custom file naming convention
-                
-                Converter.quiz_to_pdf(assessment=question_dict,
-                                      username=username, 
-                                      assessment_id=assessment_id, 
-                                      type=type, 
-                                      assessment_name=assessment.name)
-                Converter.quiz_answer_key(assessment=question_dict,
-                                          username=username, 
-                                          assessment_id=assessment_id, 
-                                          type=type, 
-                                          assessment_name=assessment.name)
-                """
             elif file_format == 'gift':
-                Converter.quiz_to_gift(exam=exam_dict, name=assessment.name, username=username)
+                Converter.exam_to_gift(exam=exam_dict, name=assessment.name, username=username)
             elif file_format == 'word':
-                Converter.quiz_to_docx(exam=exam_dict, name=assessment.name, username=username)
+                Converter.exam_to_docx(exam=exam_dict, name=assessment.name, username=username)
 
         
         if file_format == 'pdf':

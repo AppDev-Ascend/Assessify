@@ -1,0 +1,32 @@
+::Section::Section 1::Multiple Choice::
+::Question::Who were the authors that introduced the Filter Design Pattern??
+~ Gang of Four
+~ Famous Five
+~ Dynamic Duo
+~ Terrific Trio
+::Question::What is the Filter Design Pattern also known as??
+~ Decorator Pattern
+~ Singleton Pattern
+~ Criteria Pattern
+~ Builder Pattern
+::Question::What is the primary purpose of the Filter Design Pattern??
+~ To create objects
+~ To filter objects based on criteria
+~ To manage database connections
+~ To handle user input
+::Question::Which of the following is an advantage of the Filter Design Pattern??
+~ Complexity
+~ Modularity
+~ Increased Codebase
+~ Potential for Over-Abstraction
+::Question::Where can you find sample code for the Filter Design Pattern??
+~ https://github.com/alosadahg/Design-Patterns
+~ https://github.com/patterns/design
+~ https://github.com/filtersample/code
+~ https://github.com/designpatterns/sample
+::Section::Section 2::Essay::
+::Question::What is the Filter Design Pattern and how does it differ from other structural design patterns??
+::Question::What are the historical origins of the Filter Design Pattern and who were its original authors??
+::Question::In what ways can the Filter Design Pattern be applied in data analysis and search engines??
+::Question::What are the steps involved in implementing the Filter Design Pattern??
+::Question::What are the advantages and disadvantages of using the Filter Design Pattern in software development??
