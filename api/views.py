@@ -346,6 +346,8 @@ class AssessmentExportView(View):
             
             # with open('question_dict.json', 'w') as f:
             #     json.dump(question_dict, f)
+            # with open('question_dict.json', 'w') as f:
+            #     json.dump(question_dict, f)
             
             if file_format == 'pdf':
                 Converter.quiz_to_pdf(assessment=question_dict, type=type, name=assessment.name)

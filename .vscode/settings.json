@@ -1,0 +1,6 @@
+{
+    "cmake.sourceDirectory": "D:/Users/Jun Jeremy/Documents/AppDevProject/Assessify/FinalProject/FinalProject/poppler-23.11.0/share/poppler",
+    "python.analysis.extraPaths": [
+        "./api"
+    ]
+}
