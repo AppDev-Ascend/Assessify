@@ -28,7 +28,7 @@ class AssessmentForm(forms.ModelForm):
             'name',
             'type',
             'description',
-            'lesson',
+            'lesson_path',
             'no_of_questions',
         )
         widgets = {

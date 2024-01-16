@@ -24,7 +24,7 @@ class AssessmentGenerator:
         with open(file_path, 'w') as f:
             f.write(questions)
 
-    def get_quiz(self, username, assessment_type, number_of_questions, learning_outcomes, lesson="", exclude_questions=False, index=None) -> dict:
+    def get_quiz(self, username, assessment_type, number_of_questions, learning_outcomes, lesson_path="", exclude_questions=False, index=None) -> dict:
         
         print("Generating Quiz...")
         print(f"Assessment Type: {assessment_type}")
@@ -34,16 +34,8 @@ class AssessmentGenerator:
         assessment = ""
 
         if index is None:
-
-            if lesson == "":
-                print("Loading the Documents")
-                documents = SimpleDirectoryReader(fr"api\media\{username}\lessons").load_data()
-            else:
-                print("Storing the Lesson")
-                with open(fr'api\media\{username}\lessons\lesson.txt', 'w') as f:
-                    f.write(lesson)
-                documents = SimpleDirectoryReader(fr"api\media\{username}\lessons").load_data()
-
+            # Create the index
+            documents = SimpleDirectoryReader(lesson_path).load_data()
             index = VectorStoreIndex.from_documents(documents, service_context=self.service_context)
 
         # Create response format

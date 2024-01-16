@@ -37,7 +37,7 @@ class Assessment(models.Model):
     name = models.CharField(max_length=128, null=False)
     type = models.CharField(max_length=50, choices=TYPE_CHOICES, null=False)
     description = models.TextField()
-    lesson = models.TextField()
+    lesson_path = models.TextField()
     no_of_questions = models.IntegerField(null=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     date_created = models.DateField(auto_now_add=True)
@@ -58,7 +58,7 @@ class Assessment(models.Model):
         
         # API CALL
         ai = assessment_generator.AssessmentGenerator()
-        quiz = ai.get_quiz(self.user.username, s_type, s_length, l_outcomes, self.lesson)
+        quiz = ai.get_quiz(self.user.username, s_type, s_length, l_outcomes, self.lesson_path)
         
         qt = Question_Type.objects.get(type=s_type)
         questions_list = {'questions': quiz['questions']}
@@ -81,7 +81,7 @@ class Assessment(models.Model):
                 answer=q['answer'],
                 section=s
             )
-            if qt.type == 'multiple choice' or qt.type == 'true or false':
+            if qt.type == 'multiple choice' or qt.type == 'Multiple Choice' or qt.type == 'true or false' or qt.type == 'True or False':
                 options_list = q['options']
                 for j, o in enumerate(options_list, start=1):
                     option = Option.objects.create(
@@ -104,76 +104,8 @@ class Assessment(models.Model):
         l_outcomes = section['learning_outcomes']
         
         # API CALL
-        # ai = assessment_generator.AI()
-        # questions = ai.get_exam(self.lesson, s_type, s_lengths, l_outcomes)
-        
-        # SAMPLE API CALL RESULT
-        exam = {
-            "type": "Exam",
-            "sections": [
-                {
-                    "section_name": "Test 1",
-                    "section_type": "Multiple Choice",
-                    "questions": [
-                        {
-                            "question": "What is the purpose of the Prototype Design Pattern?",
-                            "options": [
-                                "To create new game characters in game development",
-                                "To save time and resources in creating similar GUI components",
-                                "To clone database records in working with databases",
-                                "To evaluate the architectural context of an application"
-                            ],
-                            "answer": 2
-                        },
-                        {
-                            "question": "What is a benefit of using the Prototype Design Pattern?",
-                            "options": [
-                                "It allows for the creation of new game characters",
-                                " It saves time and resources in generating similar UI elements",
-                                "It provides a clear and complete documentation of prototype objects",
-                                "It ensures consistent behavior and initial states of cloned objects"
-                            ],
-                            "answer": 3
-                        }
-                    ]
-                },
-                {
-                    "section_name": "Test 2",
-                    "section_type": "True or False",
-                    "questions": [
-                        {
-                            "question": "The Prototype Design Pattern is used in software development to create new objects by copying existing objects.",
-                            "answer": "True"
-                        },
-                        {
-                            "question": "The Prototype Design Pattern is used in game development to create new game characters with different attributes.",
-                            "answer": "True"
-                        }
-                    ]
-                },
-                {
-                    "section_name": "Test 3",
-                    "section_type": "Essay",
-                    "questions": [
-                        {
-                            "question": "Explain the concept of the Prototype Design Pattern and how it is used in software development. What are the key characteristics of this pattern?"
-                        },
-                        {
-                            "question": "Discuss the benefits of using the Prototype Design Pattern in game development. How does it help in creating new game characters with different attributes?"
-                        },
-                        {
-                            "question": "Describe a real-world example where the Prototype Design Pattern can be applied in graphical user interfaces. How does it save time and resources when generating similar UI elements?"
-                        },
-                        {
-                            "question": "Discuss the drawbacks or limitations of using the Prototype Design Pattern in database operations. When might it not be suitable for cloning database records?"
-                        },
-                        {
-                            "question": "Explain the importance of maintaining consistency when using the Prototype Design Pattern. How can it ensure that all cloned objects derived from the same prototype exhibit consistent behavior and initial states?"
-                        }
-                    ]
-                }
-            ]
-        }
+        ai = assessment_generator.AI()
+        exam = ai.get_exam(self.lesson, s_type, s_lengths, l_outcomes)
         
         section_list = {'sections': exam['sections']}
         

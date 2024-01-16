@@ -32,7 +32,7 @@ function addNewSection() {
             <input type="text" class="generic-form-textbox" placeholder="Select an option" onclick="toggleDropdown(this)" name="section-type_${sectionCounter}" readonly>
             <ul class="dropdown-options">
             <li onclick="selectOption(this)">Multiple Choice</li>
-            <li onclick="selectOption(this)">True or False </li>
+            <li onclick="selectOption(this)">True or False</li>
             <li onclick="selectOption(this)">Fill in The Blanks</li>
             <li onclick="selectOption(this)">Identification</li>
             <li onclick="selectOption(this)">Esssay</li>

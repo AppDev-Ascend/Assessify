@@ -168,16 +168,23 @@ class CreateAssessmentView(View):
                         learning_outcomes.append(s)
                     s.append(value)
                             
+        lesson_path = rf'api/media/{user.username}/lessons/{assessment_name}'
+        if not os.path.exists(lesson_path):
+            # If not, create it
+            os.makedirs(lesson_path)
+
+
         if 'lesson_file' in request.FILES:
             file = request.FILES['lesson_file']
             file_name = f'{file.name}'
-            path = os.path.join(settings.MEDIA_ROOT, rf'{user.username}/lessons/', file_name)
-            handle_uploaded_file(user.username, file, file_name)
+                
+            path = os.path.join(settings.MEDIA_ROOT, rf'{user.username}/lessons/{assessment_name}/', file_name)
+            handle_uploaded_file(user.username, assessment_name, file, file_name)
             file_format = file.name.split('.')[1].lower()
+        else:
+            with open(rf'api/media/{user.username}/lessons/{assessment_name}/lesson.txt', 'w') as f:
+                f.write(lesson)
             
-            # pdf to text convert
-            if file_format == 'pdf':
-                lesson = Converter.pdf_to_text(path)
 
         # assign the necessary values to the section dictionary
         section['section_types'] = section_types
@@ -187,7 +194,7 @@ class CreateAssessmentView(View):
         assessment = Assessment.objects.create(name=assessment_name,
                                                type=assessment_type,
                                                description=assessment_description,
-                                               lesson=lesson,
+                                               lesson_path=lesson_path,
                                                no_of_questions=no_of_questions,
                                                user=user)
         
@@ -235,6 +242,8 @@ class ViewAssessmentView(View):
                         # letter equivalent + worded answer
                         if q.answer == str(i):
                             q.answer = f"{chr(ord('A') + i - 1)}. {o.option}"
+                else:
+                    options = []
                        
                 temp_question_group = QuestionGroup()
                 temp_question_group.question = q
