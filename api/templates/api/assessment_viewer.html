@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang=""en>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="Assessify">
+    <meta name="description" content="Assessify login and register page, sign up now!">
+    <meta name="author" content="Ascend">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Sample Quiz Assessment 1 | Assessify </title>
+    <link rel="icon" href="static/media/favicon.png">
+    <link rel="stylesheet" href="static/css/style-global.css">
+    <link rel="stylesheet" href="static/css/style-view-assessments.css">
+    <script src="static/scripts/script.js"></script>
+  </head>
+  <!-- 
+    Frontend devs can't do much here but provide templates for displaying data. Backend peeps it's your time to shine here.
+    I'll be doing my best to describe what I want you to do.
+
+    In the assessments-homepage page, each assessment box should be uniquely tied to an ID.
+    For example, if we have an assessment instance with ID 12455 in the database. This ID should be retrieved and appended to the <a> tag of that box.
+    So now we have the link: "assessment_viewer?id=12455", using a scripting language such as PHP, Python, or Javascript, we can extract the value of the ID.
+    
+    We're going to do it that way to pass that ID as parameter to this page so that what needs to be done here is simply getting the data and automatically display them here based on that ID alone, no more multple pages.
+    Simply using that ID alone can provide us much data to populate this page.
+
+    CONTINGENCY PLAN:
+    If ever this is difficult to do or that time is simply not dispensable anymore, PDF view is a valid form of assessment viewer too.
+    The moment the user clicks the "Create Assessment" button in create_assessment.html, immediately create a PDF file of the questions.
+    As for how assessments-homepage.html would be used is another problem of its own.
+  -->
+  <body>
+    <nav class="nav-container">
+      <div class="navbar-div-left"> 
+        <a href="{% url 'home' %}" class="web-logo"><div class="nav-element"><img src="static/media/BRAND_LOGO.png" height="40" alt="logo"></div></a>
+        <a href="{% url 'home' %}" class="nav-interactable"><div class="nav-element"> Pricing </div></a>
+        <a href="{% url 'home' %}" class="nav-interactable"><div class="nav-element"> About Us </div></a>
+      </div>
+      <div class="navbar-div-right">
+        <!-- You can kinda tell one's fucked and desperate when they start using things they don't do such as... inline CSS... -->
+        <div class="tier"> BASIC </div>
+        <img src="static/media/notifications.png" height="50" width="50" class="nav-element" style="padding-left: 10px; padding-right: 10px;"/>
+        <img src="static/media/profile_picture.png" height="50" width="55" class="nav-element" style="padding-left: 10px; padding-right: 10px;"/>
+        <a href="register-login.html" class="nav-interactable"><div class="nav-element"> Log Out </div></a>
+      </div>
+      </nav>
+    </nav>
+  </body>
+  <main class="generic-content-container">
+    
+      <!-- Using a script, populate this section with content according to their question types. -->
+      <!-- For ease, use the ID of the assessment and retrieve those questions associated with that ID. -->
+      <!-- This is how it looks in HTML code. -->
+
+      <!--
+        TEMPLATES TO USE:
+        - APPEND THEM WITHIN THE "assessment-container" div class.
+
+        - Generally used for both True or False questions and Multiple Choice questions:
+        - Represents a div showing an assessment section with 1 item containing 4 choices.
+        <div class="assessment-section">
+          <h2> Section ${section_number} </h2>
+          <ol class="choiced-items" type="1">
+            <li class="item"> ${question} <br/> <b> Answer: ${answer} </b>
+              <ol class="options" type="A">
+                <li> ${choice} </li>
+                <li> ${choice} </li>
+                <li> ${choice} </li>
+                <li> ${choice} </li>
+              </ol>
+            </li
+          <ol>
+        </div>
+
+        - Used for questions with no options at all:
+        - Represents a div showing an assessment section with 3 items without choices.
+          <div class="assessment-section">
+            <h2> Section ${section_number} </h2>
+            <ol class="choiced-items" type="1">
+            <ol class="non-choiced-item" type="1">
+              <li class="item"> ${question} <br/> <b> Answer: ${answer} </b></li>
+              <li class="item"> ${question} <br/> <b> Answer: ${answer} </b></li>
+              <li class="item"> ${question} <br/> <b> Answer: ${answer} </b></li>
+            </ol>
+          </div>
+      -->
+      <div class="content-grid">
+      {% if action == 'view' %}
+        <div class="assessment-container">
+          <div class="assessment-section">
+            <h1> {{ assessment.name }} </h1>
+            <p> {{ assessment.description }} </p>
+            {% for s, qt, qg in assessment_data %}
+              Section {{ s.section_no}}
+              <h2> {{ s.name }} </h2>
+              <h4> {{ qt.type }} </h4>
+              {{ s.description }}
+              
+              <ol class="choiced-items" type="1">
+              {% for q in qg %}
+                  <li class="item"> {{ q.question.question }} <br/> 
+                  {% if q.question.answer != "" %}
+                      <b> Answer: {{ q.question.answer }} </b>
+                  </li>
+                  {% endif %}
+
+                  {% comment %} when true or false are included in options
+                  {% if qt.type == 'multiple choice' or qt.type == 'true or false' %} {% endcomment %}
+                  {% if qt.type == 'Multiple Choice' %}
+                    <ol class="options" type="A">
+                        {% for o in q.options %}
+                            <li> {{ o.option }} </li>
+                        {% endfor %}
+                    </ol>
+                  {% endif %}
+
+              {% endfor %}
+              </ol>
+            {% endfor %}
+            </div>
+            <h3>
+              <a href="{% url 'export_assessment' %}?as={{ assessment.pk }}&ff=pdf"> EXPORT (to PDF) </a>
+              <a href="{% url 'export_assessment' %}?as={{ assessment.pk }}&ff=gift" style="padding-left: 250px;"> EXPORT (to GIFT) </a>
+              <a href="{% url 'view_assessment' %}?as={{ assessment.pk }}&page=edit" style="padding-left: 250px;"> EDIT </a>
+            </h3>
+          </div>
+          
+      {% elif action == 'edit' %}
+
+        <form class="container-form" method="post">
+          {% csrf_token %}
+          <div class="assessment-container">
+            <label> Assessment Name: </label>
+            <input class="generic-form-textbox" type="text" name="assessmentname_{{ assessment.pk }}" value="{{ assessment.name }}">
+            <label> Description: </label>
+            <input class="generic-form-textbox" type="text" name="assessmentdescription_{{ assessment.pk }}" value="{{ assessment.description }}">
+            <br><br>
+            <div class="content-grid">
+              <div class="assessment-section">
+              {% for s, qt, qg in assessment_data %}
+                  Section {{ s.section_no}}<br><br>
+                  <label> Section Name: </label>
+                  <input class="generic-form-textbox" type="text" name="sectionname_{{ s.pk }}" value="{{ s.name }}">
+                  <label> Description:</label>
+                  <input class="generic-form-textbox" type="text" name="sectiondescription_{{ s.pk }}" value="{{ s.description }}">
+                  {{ qt.type }}
+
+                  <ol class="choiced-items" type="1">
+                  {% for q in qg %}
+                      <li class="item"> 
+                        <label>Question</label>
+                        <input class="generic-form-textbox" type="text" name="question_{{ q.question.pk }}" value="{{ q.question.question }}">
+                      
+                      {% comment %} when true or false are included in options
+                      {% if qt.type == 'multiple choice' or qt.type == 'true or false' %} {% endcomment %}
+                      {% if qt.type == 'Multiple Choice' %}
+                        <label>Answer</label>
+                        <input class="generic-form-textbox" type="text" name="answerwc_{{ q.question.pk }}" value="{{ q.question.answer }}">
+                      </li>
+                        <ol class="options" type="A">
+                            {% for o in q.options %}
+                                <li> 
+                                  <input class="generic-form-textbox" type="text" name="option_{{ o.pk }}" value="{{ o.option }}">
+                                </li>
+                            {% endfor %}
+                        </ol>
+
+                      {% else %}
+                        <label>Answer</label>
+                        {% if q.question.answer != "" %}
+                        <input class="generic-form-textbox" type="text" name="answer_{{ q.question.pk }}" value="{{ q.question.answer }}">
+                        {% else %}
+                        <input class="generic-form-textbox" type="text" name="answer_{{ q.question.pk }}">
+                        {% endif %}
+                      </li>
+                      {% endif %}
+
+                  {% endfor %}
+                  </ol>
+              {% endfor %}
+            </div>
+          </div>
+          <button class="generic-button" type="submit"> Save </button>
+        </form>
+      {% endif %}
+        
+      </div>
+    </div>
+  </main>
+</html>

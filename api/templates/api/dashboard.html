@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang=""en>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="Assessify">
+    <meta name="description" content="Assessify login and register page, sign up now!">
+    <meta name="author" content="Ascend">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> My Assessments | Assessify </title>
+    <link rel="icon" href="static/media/favicon.png">
+    <link rel="stylesheet" href="static/css/style-main.css">
+    <script src="static/scripts/script.js"></script>
+  </head>
+  <body>
+    <nav class="nav-container">
+        <div class="navbar-div-left"> 
+          <a href="{% url 'home' %}" class="web-logo"><div class="nav-element"><img src="static/media/BRAND_LOGO.png" height="40" alt="logo"></div></a>
+          <a href="{% url 'home' %}" class="nav-interactable"><div class="nav-element"> Pricing </div></a>
+          <a href="{% url 'home' %}" class="nav-interactable"><div class="nav-element"> About Us </div></a>
+        </div>
+        <div class="navbar-div-right">
+          <a href="{% url 'logout' %}" class="nav-interactable"><div class="nav-element"> Log Out </div></a>
+        </div>
+      </nav>
+      
+      <main class="generic-content-container">
+        
+        <!-- General page header components, for titling and subtitling only. -->
+      <div class="content-header">
+        <div class="left-header">
+          <img src="static/media/assessments.png" width="80" height="80"/>
+          <h1> My Assessments </h1>
+        </div>
+
+        <form class="right-header">
+          <input class="generic-form-textbox" type="text" placeholder="Search for assessments you've made..." name="search_query">
+          <img class="non-interactable-placeholder" src="static/media/sort-by.png" width="32" height="32"/>
+          <img class="non-interactable-placeholder" src="static/media/grid-view.png" width="32" height="32"/>
+        </form>
+      </div>
+
+      <!-- Container for individual assessment boxes. -->
+      <div class="assessment-grid-container">
+
+        {% for assessment in assessments %}
+        <a href="{% url 'view_assessment' %}?as={{ assessment.pk }}&page=view">
+        <div class="assessment-grid-container">
+          <div class="assessment-box">
+            <div class="assessment-description">
+              <h2> {{ assessment.name }} </h2>
+              <p> {{ assessment.type }} | {{ assessment.no_of_questions }} | {{ assessment.date_created }} </p>
+              <p> {{ assessment.description }} </p>
+            </div>
+          </div>
+        </div>
+        </a>
+        {% endfor %}
+
+        <!-- Static component for assessment creation box, should've been an ID instead of a class. -->
+        <a href="javascript:void(0);" onclick="showPrompt()">
+          <div class="assessment-create-box">
+            <img src="static/media/dwafawf.png" height="150" width="165">
+            <h2> Create New <br> Assessment </h2>
+          </div>
+        </a>
+
+      </div>
+    </main>
+
+      <div id="promptContainer" class="prompt-container">
+        <h1> Create New Assessment </h1>
+        <p> It's time to test how far the student has learned on a specific topic. <br> Choose the type of assessment you wish to create.</p>
+        <div class="options-container">
+          <a href="{% url 'create_assessment' %}?type=quiz">
+            <div class="option-box">
+              <img src="static/media/quiz-icon.png" height="185" width="200"/>
+              <h2> Quiz Type </h2>
+              <p> Quiz is a quick way to assess students on a topic. Recommended for short and simple assessments. </p>
+            </div>
+          </a>
+          <div class="bruh"></div>
+          <a href="{% url 'create_assessment' %}?type=exam">
+            <div class="option-box">
+              <img src="static/media/exam-icon.png" height="185" width="200"/>
+              <h2> Exam Type </h2>
+              <p> Exams are a comprehensive assessment on multiple topics. Recommended for long form assessments. </p>
+            </div>
+            </a>
+        </div>
+        <a href="javascript:void(0);" onclick="closePrompt()"><div class="generic-button-variant"> Cancel </div></a>
+      </div>
+      <div id="overlay" class="overlay"></div>
+
+  </body>
+</html>

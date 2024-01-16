@@ -1,0 +1,58 @@
+.generic-content-container {
+    margin: 0px;
+    width: 100%;
+    display: flex;
+    font-family: 'Raleway';
+    box-sizing: border-box;
+}
+
+.content-slideshow-container {
+    width: 65%;
+    max-height: 100vh;
+    overflow: hidden;
+}
+.content-slideshow-container .slideshow-image {
+    display: none;
+    transition: opacity 1s ease-in-out;
+    animation: fade 10s ease-in-out infinite;
+}
+.content-slideshow-container .slideshow-image img {
+    height: 100vh;
+    width: auto;
+    max-width: 100%;
+    object-fit: cover;
+    box-sizing: border-box;
+    z-index: -1;;
+}
+
+.content-form-container {
+    height: 100%;
+    width: 35%;
+    margin-top: 56px;
+    padding: 45px;
+}
+.content-form-container #register-container {
+    display: block;
+}
+.content-form-container #login-container {
+    display: block;
+}
+
+.register-container .container-form {
+    margin: 10px 0px 0px 0px;
+}
+.container-form label {
+    display: block;
+}
+.container-form .generic-form-textbox:focus {
+    border: 2px solid green;
+}
+.container-footer a:hover, a:visited, a:link {
+    text-decoration: none;
+    color: black;
+}
+
+@keyframes fade {
+    0%, 100% { opacity: 0; }
+    15%, 75% { opacity: 1; }
+}
