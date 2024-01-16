@@ -495,7 +495,7 @@ class Converter:
     @staticmethod
     def quiz_to_docx(quiz, name, username):
         document = Document()
-
+        
         # Get the type of the quiz
         quiz_type = quiz["type"]
         document.add_heading(quiz_type, level=1)
@@ -520,9 +520,7 @@ class Converter:
                 # Add answers
                 document.add_heading("Answer Key", level=1)
                 for i, question_data in enumerate(quiz["questions"], start=1):
-                    answer_index = question_data["answer"] - 1
-                    correct_answer = question_data["options"][answer_index]
-                    answer_text = f"Question {i}: {chr(65 + answer_index)}. {correct_answer}"
+                    answer_text = f"Question {i}: {question_data['answer']}"
                     document.add_paragraph(answer_text, style="Body Text")
             
             case "essay":
@@ -561,7 +559,7 @@ class Converter:
                     document.add_paragraph(answer_text, style="Body Text")
 
         # Save the document
-        file_path = fr'api\media\{username}\{name}_quiz_{quiz_type.lower().replace(" ", "_")}.docx'
+        file_path = fr'api\media\{username}\exports\{name}_quiz.docx'
         document.save(file_path)
 
     @staticmethod

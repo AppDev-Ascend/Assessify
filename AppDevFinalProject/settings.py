@@ -142,7 +142,7 @@ STATICFILES_DIRS = [BASE_DIR / 'api/templates/static']
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'api/media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'api\media')
 # MEDIA_URL = 'api/media/'
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 

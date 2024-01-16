@@ -90,14 +90,14 @@ class Assessment(models.Model):
                     answer=q['answer'],
                     section=s
                 )
-            if qt.type == 'multiple choice' or qt.type == 'Multiple Choice' or qt.type == 'true or false' or qt.type == 'True or False':
+            if qt.type.lower() in ['multiple choice', 'true or false']:
                 options_list = q['options']
-                for j, o in enumerate(options_list, start=1):
+                for j, o in enumerate(options_list, start=0):
                     option = Option.objects.create(
                         option_no=j,
                         option=o,
                         question=question
-                )
+                    )
 
         return self
     
@@ -153,6 +153,7 @@ class Assessment(models.Model):
                     answer = ''
                 else:
                     answer = q['answer']
+                    print(answer)
                     
                 question = Question.objects.create(
                     question_no=j,
@@ -160,11 +161,10 @@ class Assessment(models.Model):
                     answer=answer,
                     section=sec
                 )
-                # when true or false includes options
-                # if s_type == 'multiple choice' or s_type == 'true or false': 
+                
                 if s_type == 'multiple choice':
                     options_list = q['options']
-                    for k, o in enumerate(options_list, start=1):
+                    for k, o in enumerate(options_list, start=0):
                         option = Option.objects.create(
                             option_no=k,
                             option=o,

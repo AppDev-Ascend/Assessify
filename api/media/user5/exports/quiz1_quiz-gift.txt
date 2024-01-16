@@ -1,0 +1,25 @@
+::Question::Which interface in Java indicates that an object can be cloned??
+~ Serializable
+~ Cloneable
+~ Iterable
+~ Comparable
+::Question::What exception is thrown if an object does not implement Cloneable and the clone() method is called??
+~ IllegalAccessException
+~ InstantiationException
+~ CloneNotSupportedException
+~ NoSuchMethodException
+::Question::What type of copy is created by the default implementation of the clone() method??
+~ Deep copy
+~ Shallow copy
+~ Full copy
+~ Exact copy
+::Question::Where is the clone() method inherited from in Java??
+~ Cloneable interface
+~ Java Virtual Machine
+~ Object class
+~ System class
+::Question::Which programming language is associated with the Cloneable interface??
+~ C++
+~ Java
+~ Python
+~ Smalltalk

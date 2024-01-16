@@ -231,17 +231,16 @@ class ViewAssessmentView(View):
             q_list = []
             
             for q in questions:
-                
                 # when true or false includes options
                 # if qt.type == 'Multiple Choice' or qt.type == 'True or False':
                 if qt.type == 'Multiple Choice':
                     options = list(Option.objects.filter(question=q).order_by('option_no'))
                     
-                    for i, o in enumerate(options, start=1):
+                    for i, o in enumerate(options):
                         # reassigns the answer of the question to its 
                         # letter equivalent + worded answer
                         if q.answer == str(i):
-                            q.answer = f"{chr(ord('A') + i - 1)}. {o.option}"
+                            q.answer = f"{chr(ord('A') + i)}. {o.option}"
                 else:
                     options = []
                        
@@ -363,9 +362,8 @@ class AssessmentExportView(View):
                 """
             elif file_format == 'gift':
                 Converter.quiz_to_gift(json_data=question_dict, name=assessment.name, username=username)
-            
             elif file_format == 'word':
-                Converter.quiz_to_docx(assessment=question_dict, name=assessment.name, username=username)
+                Converter.quiz_to_docx(quiz=question_dict, name=assessment.name, username=username)
         
         else:
             exam_dict = {'type': 'exam'}
@@ -391,6 +389,7 @@ class AssessmentExportView(View):
                         # gets the list of data from the column 'option'
                         options = list(Option.objects.filter(question=q).values_list('option', flat=True))
                         question_data['options'] = options
+                        print(q.answer)
                         option_answer = Option.objects.get(question=q, option_no=q.answer)
                         question_data['answer'] = f'{chr(96 + option_answer.option_no)}. {option_answer}'
                         
@@ -401,8 +400,6 @@ class AssessmentExportView(View):
 
             exam_dict['sections'] = section_list
             
-            with open('exam_dict.json', 'w') as f:
-                json.dump(exam_dict, f)
             
             if file_format == 'pdf':
                 Converter.exam_to_pdf(exam=exam_dict, name=assessment.name)
@@ -421,10 +418,32 @@ class AssessmentExportView(View):
             elif file_format == 'gift':
                 Converter.exam_to_gift(exam=exam_dict, output_file=None, name=assessment.name)
 
+            if file_format == 'pdf':
+                Converter.exam_to_pdf(exam=exam_dict, name=assessment.name, username=username)
+                Converter.exam_answer_key(exam=exam_dict, name=assessment.name, username=username)
+                """
+                if there is a custom file naming convention
+                
+                Converter.quiz_to_pdf(assessment=question_dict,
+                                      username=username, 
+                                      assessment_id=assessment_id, 
+                                      type=type, 
+                                      assessment_name=assessment.name)
+                Converter.quiz_answer_key(assessment=question_dict,
+                                          username=username, 
+                                          assessment_id=assessment_id, 
+                                          type=type, 
+                                          assessment_name=assessment.name)
+                """
+            elif file_format == 'gift':
+                Converter.quiz_to_gift(exam=exam_dict, name=assessment.name, username=username)
+            elif file_format == 'word':
+                Converter.quiz_to_docx(exam=exam_dict, name=assessment.name, username=username)
+
         
         if file_format == 'pdf':
             # Create the zip file
-            file_path = rf'files\exports\{assessment.name}_assessment.zip'
+            file_path = rf'{username}\exports\{assessment.name}_assessment.zip'
             
             with ZipFile(rf'{settings.MEDIA_ROOT}\{file_path}', 'w') as zip_object:
                 # Adding files to the zip file
@@ -439,14 +458,14 @@ class AssessmentExportView(View):
                     assessment_file_name = 'exam'
                     answer_key_file_name = 'exam_answer-key'
                 
-                assessment_file_path = rf'{settings.MEDIA_ROOT}\files\exports\{assessment.name}_{assessment_file_name}.{file_format}'
-                answer_key_file_path = rf'{settings.MEDIA_ROOT}\files\exports\{assessment.name}_{answer_key_file_name}.{file_format}'
+                assessment_file_path = rf'{settings.MEDIA_ROOT}\{username}\exports\{assessment.name}_{assessment_file_name}.{file_format}'
+                answer_key_file_path = rf'{settings.MEDIA_ROOT}\{username}\exports\{assessment.name}_{answer_key_file_name}.{file_format}'
                         
                 zip_object.write(assessment_file_path, os.path.basename(assessment_file_path))
                 zip_object.write(answer_key_file_path, os.path.basename(answer_key_file_path))
         
         elif file_format == 'word':
-            pass
+            file_path = rf"{username}\exports\{assessment.name}_{assessment.type}.docx"
         else:
             file_path = rf"{username}\exports\{assessment.name}_{assessment.type}-gift.txt"
                         
