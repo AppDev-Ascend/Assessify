@@ -51,6 +51,9 @@ class UserRegisterView(View):
         if password == re_password:
             try:
                 user = User.objects.create_user(email=email, username=username, password=password)
+                os.makedirs(fr'api\media\{username}\lessons', exist_ok=True)
+                os.makedirs(fr'api\media\{username}\exports', exist_ok=True)
+
                 # If the user is created successfully, you can redirect
                 return redirect('home')
             
@@ -114,13 +117,11 @@ class CreateAssessmentView(View):
     
     def get(self, request):
         a_type = request.GET.get('type')
-        print(a_type)
         return render(request, self.template)
 
     def post(self, request):
         user_id = request.session['_auth_user_id']
         user = User.objects.get(pk=user_id)
-        print(f'user: {user_id}')
         
         # for assessment creation
         assessment_name = request.POST.get('assessment_name')
@@ -134,12 +135,9 @@ class CreateAssessmentView(View):
         section_types = []
         section_lengths = []
         learning_outcomes = []
-        # no_of_sections = 0
         
         if assessment_type == 'quiz':
-            # no_of_sections = 1
             for key, value in request.POST.items():
-                print(f'KEY: {key}, VALUE: {value}')
                 
                 if key.startswith('section-type'):
                     section_types.append(value.lower().lstrip())
@@ -155,11 +153,8 @@ class CreateAssessmentView(View):
         elif assessment_type == 'exam':
             s = []
             for key, value in request.POST.items():
-                print(f'key: {key}')
-                print(f'value: {value}')
                 
                 if key.startswith('section-type'):
-                    # no_of_sections += 1
                     s = []
                     section_types.append(value.lower().lstrip())
                 
@@ -172,24 +167,17 @@ class CreateAssessmentView(View):
                     if not s:
                         learning_outcomes.append(s)
                     s.append(value)
-            
-            print(f's_types: {section_types}')
-            print(f's_lengths: {section_lengths}')
-            print(f'l_outcomes: {learning_outcomes}')
                             
         if 'lesson_file' in request.FILES:
             file = request.FILES['lesson_file']
-            file_name = f'{user_id}_{file.name}'
-            path = os.path.join(settings.MEDIA_ROOT, 'files', file_name)
-            handle_uploaded_file(file, file_name)
+            file_name = f'{file.name}'
+            path = os.path.join(settings.MEDIA_ROOT, rf'{user.username}/lessons/', file_name)
+            handle_uploaded_file(user.username, file, file_name)
             file_format = file.name.split('.')[1].lower()
             
             # pdf to text convert
             if file_format == 'pdf':
                 lesson = Converter.pdf_to_text(path)
-            
-        else:
-            print('no file')
 
         # assign the necessary values to the section dictionary
         section['section_types'] = section_types
@@ -202,7 +190,6 @@ class CreateAssessmentView(View):
                                                lesson=lesson,
                                                no_of_questions=no_of_questions,
                                                user=user)
-        print(f'assessment_id: {assessment.pk}')
         
         if assessment_type == 'quiz':
             assessment.create_quiz(section)
@@ -252,8 +239,6 @@ class ViewAssessmentView(View):
                 temp_question_group = QuestionGroup()
                 temp_question_group.question = q
                 temp_question_group.options = options
-                print(f'question: {q}')
-                print(f'answer: {q.answer}')
                 q_list.append(temp_question_group)    
                 
             question_group.append(q_list)  
@@ -273,8 +258,6 @@ class ViewAssessmentView(View):
     def post(self, request):
         assessment_id = request.GET.get('as')
         for key, value in request.POST.items():
-            print(f'key: {key}')
-            print(f'value: {value}')
             k = key.split('_')
             
             if k[0] == 'assessmentname':
@@ -352,8 +335,8 @@ class AssessmentExportView(View):
                 
             question_dict['questions'] = question_data_list
             
-            with open('question_dict.json', 'w') as f:
-                json.dump(question_dict, f)
+            # with open('question_dict.json', 'w') as f:
+            #     json.dump(question_dict, f)
             
             if file_format == 'pdf':
                 Converter.quiz_to_pdf(assessment=question_dict, type=type, name=assessment.name)
@@ -408,7 +391,6 @@ class AssessmentExportView(View):
                 section_list.append(section_data)
 
             exam_dict['sections'] = section_list
-            print(exam_dict)
             
             with open('exam_dict.json', 'w') as f:
                 json.dump(exam_dict, f)
@@ -471,222 +453,5 @@ class AssessmentsView(View):
     
     def post(self, request):
         return 
-
-""""
-            ! OLD VIEWS !
-@method_decorator(login_required, name='dispatch')
-class AssessmentView(View):
-    template = 'api/assessment.html'
-    
-    def get(self, request):
-        action = request.GET.get('act')    
-        print(action)    
-        assessment_name = request.GET.get('as')
-        assessment = Assessment.objects.get(name=assessment_name)
-        # a_form = AssessmentForm(instance=assessment)
-        
-        # form_list = []
-        # section_list = Section
-        # questions = Question.objects.filter(assessment_id=assessment.pk)
-        # q_list = list(questions)
-        # if assessment.type == 'quiz':
-        #     q_type.append(questions.type[0])
-        # elif assessment.type == 'exam':
-            
-        # for q in q_list:
-        #     q_form = AssessmentQuestionForm(instance=q)
-        #     q_form.prefix = f'question_{q.pk}_content'  # Set a unique prefix for each question form
-        #     form_list.append(q_form)
-
-        #     options = Option.objects.filter(question_id=q.pk)
-        #     o_list = list(options)
-        #     for o in o_list:
-        #         o_form = AssessmentOptionForm(instance=o)
-        #         o_form.prefix = f'option_q-{q.pk}_o-{o.pk}_content'  # Set a unique prefix for each option form
-        #         form_list.append(o_form)
-        
-        # view = False
-        # if action == 'view':
-        #     view = True
-        #     for field_name, field in a_form.fields.items():
-        #         field.widget.attrs['disabled'] = 'disabled'
-            
-        #     for form in form_list:
-        #         for field_name, field in form.fields.items():
-        #             field.widget.attrs['disabled'] = 'disabled'
-            
-        return render(request, self.template, {'assessment': assessment,
-                                               'a_form': a_form, 
-                                               'q_type': q_type,
-                                               'form_list': form_list,
-                                               'view': view})
-
-    def post(self, request):
-        action = request.GET.get('act')    
-        assessment_name = request.GET.get('as')
-        assessment = Assessment.objects.get(name=assessment_name)
-        ctr = 0
-        
-        if action == 'edit':
-            for key, value in request.POST.items():
-                print(f'Key: {key}, Value: {value}')
-                if key.startswith('question_'):
-                    string = key.split('_')
-                    q_id = int(string[1])
-                    qc = string[2].split('-')[1]
-                    question = Question.objects.get(id=q_id)
-
-                    if qc == "question_no":
-                        question.question_no = value
-                    elif qc == "question":
-                        question.question = value
-                    elif qc == "answer":
-                        question.answer = value
-                    question.save()
-
-                elif key.startswith('option_'):
-                    string = key.split('_')
-                    o_id = string[2].split('-')[1]
-                    option = Option.objects.get(id=o_id)
-                    if ctr == 0:
-                        option.option_no = value
-                        ctr += 1
-                    else:
-                        option.option = value
-                        ctr -= 1
-                    option.save()
-            return redirect(reverse('assessment_view') + '?' + urlencode({'as': assessment_name, 'act': 'view'}))
-        
-        file_format = request.POST.get('formats')    
-        return redirect(reverse('assessment_export') + '?' + urlencode({'as': assessment_name, 'ff': file_format}))
-
-@method_decorator(login_required, name='dispatch')
-class AssessmentTypeView(View):
-    def get(self, request):
-        template = "api/assessment_type.html"
-        return render(request, template)
-    
-# Adds assessments
-@method_decorator(login_required, name='dispatch')
-class AssessmentAddView(View):
-    # Modify here for front-end
-    def get(self, request):
-        template = "api/assessment_add.html"
-        form = AssessmentAddForm()
-        a_type = request.GET.get('at')
-        # if a_type == 'quiz':
-            
-        return render(request, template, {'form': form})
-
-    def post(self, request):
-        form = AssessmentAddForm(request.POST)
-        user_id = request.session['_auth_user_id']
-        user = User.objects.get(pk=user_id)
-        a_type = request.GET.get('at')
-        
-        if form.is_valid():
-            if 'file' in request.FILES:
-                file = request.FILES['file']
-                path = os.path.join(settings.MEDIA_ROOT, 'files', file.name)
-                handle_uploaded_file(file)
-                file_format = file.name.split('.')[1].lower()
-                
-                # pdf to text convert
-                if file_format == 'pdf':
-                    lesson = Converter.pdf_to_text(path)
-                
-            else:
-                lesson = form.cleaned_data['lesson']
-                print('no file')
-        
-        assessment = Assessment.objects.create(name=form.cleaned_data['name'],
-                                               type=a_type,
-                                               description=form.cleaned_data['description'],
-                                               lesson=lesson,
-                                               no_of_questions=form.cleaned_data['no_of_questions'],
-                                               learning_outcomes=form.cleaned_data['learning_outcomes'],
-                                               user=user)
-        
-        q_type = form.cleaned_data['question_type']
-        
-        if a_type == 'quiz':
-            assessment.create_quiz(q_type=q_type)
-        elif a_type == 'exam':
-            assessment.create_exam(q_type=q_type)
-        
-        return redirect(reverse('assessment_questions') + '?' + urlencode({'as': assessment.name, 'qt': q_type}))
-        
-@method_decorator(login_required, name='dispatch')
-class AssessmentQuestionsView(View):
-    template_name = 'api/assessment_question.html'
-    
-    def get(self, request):
-        assessment_name = request.GET.get('as')
-        assessment = Assessment.objects.get(name=assessment_name)
-        q_type = request.GET.get('qt')
-        questions = Question.objects.filter(assessment=assessment)
-        q_list = list(questions)
-        form_list = []
-        
-        
-
-        for q in q_list:
-            q_form = AssessmentQuestionForm(instance=q)
-            # print(q.pk)
-            q_form.prefix = f'question_{q.pk}_content'  # Set a unique prefix for each question form
-            form_list.append(q_form)
-
-            options = Option.objects.filter(question_id=q.pk)
-            o_list = list(options)
-            for o in o_list:
-                o_form = AssessmentOptionForm(instance=o)
-                o_form.prefix = f'option_q-{q.pk}_o-{o.pk}_content'  # Set a unique prefix for each option form
-                form_list.append(o_form)
-
-        return render(request, template_name=self.template_name, context={'form_list': form_list, 'assessment': assessment, 'q_type': q_type})
-
-    
-    def post(self, request):    
-        ctr = 0
-        for key, value in request.POST.items():
-            # print(f'Key: {key}, Value: {value}')
-            if key.startswith('question_'):
-                string = key.split('_')
-                q_id = int(string[1])
-                qc = string[2].split('-')[1]
-                question = Question.objects.get(id=q_id)
-
-                if qc == "question_no":
-                    # print(f'question_no: {value}')
-                    question.question_no = value
-                elif qc == "question":
-                    # print(f'question: {value}')
-                    question.question = value
-                elif qc == "answer":
-                    # print(f'answer: {value}')
-                    question.answer = value
-
-                question.save()
-
-            elif key.startswith('option_'):
-                string = key.split('_')
-                o_id = string[2].split('-')[1]
-                option = Option.objects.get(id=o_id)
-                if ctr == 0:
-                    option.option_no = value
-                    ctr += 1
-                else:
-                    option.option = value
-                    ctr -= 1
-                option.save()
-
-        action = request.POST.get('action')
-        assessment_name = request.GET.get('as')
-        q_type = request.GET.get('qt')
-        print(q_type)
-        print(assessment_name)
-            
-        return redirect('home')
-"""
     
 

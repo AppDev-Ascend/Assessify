@@ -1,0 +1,66 @@
+{
+    "type": "Exam",
+    "sections": [
+        {
+            "section_name": "Test 1",
+            "section_type": "Multiple Choice",
+            "questions": [
+                {
+                    "question": "What is the purpose of the Prototype Design Pattern?",
+                    "options": [
+                        "To create new game characters in game development",
+                        "To save time and resources in creating similar GUI components",
+                        "To clone database records in working with databases",
+                        "To evaluate the architectural context of an application"
+                    ],
+                    "answer": 2
+                },
+                {
+                    "question": "What is a benefit of using the Prototype Design Pattern?",
+                    "options": [
+                        "It allows for the creation of new game characters",
+                        "It saves time and resources in generating similar UI elements",
+                        "It provides a clear and complete documentation of prototype objects",
+                        "It ensures consistent behavior and initial states of cloned objects"
+                    ],
+                    "answer": 3
+                }
+            ]
+        },
+        {
+            "section_name": "Test 2",
+            "section_type": "True or False",
+            "questions": [
+                {
+                    "question": "The Prototype Design Pattern is used in software development to create new objects by copying existing objects.",
+                    "answer": "True"
+                },
+                {
+                    "question": "The Prototype Design Pattern is used in game development to create new game characters with different attributes.",
+                    "answer": "True"
+                }
+            ]
+        },
+        {
+            "section_name": "Test 2",
+            "section_type": "Essay",
+            "questions": [
+                {
+                    "question": "1. Explain the concept of the Prototype Design Pattern and how it is used in software development. What are the key characteristics of this pattern?"
+                },
+                {
+                    "question": "2. Discuss the benefits of using the Prototype Design Pattern in game development. How does it help in creating new game characters with different attributes?"
+                },
+                {
+                    "question": "3. Describe a real-world example where the Prototype Design Pattern can be applied in graphical user interfaces. How does it save time and resources when generating similar UI elements?"
+                },
+                {
+                    "question": "4. Discuss the drawbacks or limitations of using the Prototype Design Pattern in database operations. When might it not be suitable for cloning database records?"
+                },
+                {
+                    "question": "5. Explain the importance of maintaining consistency when using the Prototype Design Pattern. How can it ensure that all cloned objects derived from the same prototype exhibit consistent behavior and initial states?"
+                }
+            ]
+        }
+    ]
+}

@@ -57,65 +57,8 @@ class Assessment(models.Model):
         l_outcomes = section['learning_outcomes']
         
         # API CALL
-        # ai = assessment_generator.AI()
-        # questions = ai.get_quiz(self.lesson, s_type, s_length, l_outcomes)
-
-        # SAMPLE API CALL RESULT
-        quiz = {"type": "Multiple Choice",
-                     "questions":
-                         [
-                             {
-                                 "question": "What is the purpose of the Prototype pattern?",
-                                 "options": [
-                                     "To create new objects from scratch",
-                                     "To copy an existing object as a blueprint for creating new objects",
-                                     "To reduce the complexity of object creation",
-                                     "To maintain object relationships"
-                                 ],
-                                 "answer": 2
-                             },
-                             {
-                                 "question": "Which component is responsible for creating new objects using the Prototype pattern?",
-                                 "options": [
-                                     "Prototype",
-                                     "Concrete Prototype",
-                                     "Client",
-                                     "Prototype Registry"
-                                 ],
-                                 "answer": 3
-                             },
-                             {
-                                 "question": "When is the Prototype pattern useful?",
-                                 "options": [
-                                     "When object creation is more efficient by copying an existing object",
-                                     "When a class cannot anticipate the type of objects it must create",
-                                     "When configuring complex objects with different properties",
-                                     "All of the above"
-                                 ],
-                                 "answer": 4
-                             },
-                             {
-                                 "question": "What are the pros of using the Prototype pattern?",
-                                 "options": [
-                                     "Object creation efficiency and flexible object creation",
-                                     "Reduced complexity and maintains object relationships",
-                                     "Efficient cloning and reduced need for proper initialization",
-                                     "All of the above"
-                                 ],
-                                 "answer": 4
-                             },
-                             {
-                                 "question": "What are the cons of using the Prototype pattern?",
-                                 "options": [
-                                     "Cloning complexity and potential for inefficient cloning",
-                                     "Need for proper initialization and maintaining prototypes",
-                                     "Object creation efficiency and reduced complexity",
-                                     "All of the above"
-                                 ],
-                                 "answer": 1
-                             }
-                         ]
-                     }
+        ai = assessment_generator.AssessmentGenerator()
+        quiz = ai.get_quiz(self.user.username, s_type, s_length, l_outcomes, self.lesson)
         
         qt = Question_Type.objects.get(type=s_type)
         questions_list = {'questions': quiz['questions']}
