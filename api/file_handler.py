@@ -4,8 +4,8 @@ import os
 from django.conf import settings
 
 
-def handle_uploaded_file(file):
-    with open(os.path.join(settings.MEDIA_ROOT, 'files', file.name), 'wb+') as destination:
+def handle_uploaded_file(file, file_name):
+    with open(os.path.join(settings.MEDIA_ROOT, 'files', file_name), 'wb+') as destination:
         for chunk in file.chunks():
             destination.write(chunk)
 

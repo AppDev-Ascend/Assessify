@@ -107,6 +107,11 @@ class AI:
 
         return assessment_json
 
+    #                   ! ISSUES !
+    # 1. Consider the number of questions for each section  
+    # 2. Include true or false as options [optional]
+    # 
+    
     def get_exam(self, lesson, exam_format, learning_outcomes) -> dict:
          
         print("Generating an exam...\n\n")

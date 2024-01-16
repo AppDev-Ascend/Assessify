@@ -48,12 +48,12 @@
             <br><br><br>
             <form class="container-form" method="post">
               {% csrf_token %}
-                <label> Email </label>
+                <label> Email or Username </label>
               <input class="generic-form-textbox" type="text" name="email">
               <label> Password </label>
               <input class="generic-form-textbox" type="password" name="password">
-              {{ error }}
-              <br><br><br><hr><br>
+              <span style="color: #FF0000"> {{ error }} </span>
+              <br><br><br>
               <button class="generic-button" type="submit"> Sign In </button>
             </form>
 
