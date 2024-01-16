@@ -80,7 +80,7 @@ class AssessmentGenerator:
                                 Respond only with the output in the exact format specified, with no explanation or conversation.'
 
         # Format for the prompt
-        if learning_outcomes == []:
+        if learning_outcomes == [] or learning_outcomes == None:
             my_prompt = f"Generate {number_of_questions} {question}.\n\n{response_format}"
         else:
             formatted_learning_outcomes = "\n".join(learning_outcomes)
@@ -134,11 +134,12 @@ class AssessmentGenerator:
             "type": "Exam",
             "sections": []
         }
-
+        counter = 1
         for section in exam_format:
-            section_name, assessment_type, question_count, learning_outcomes = section
+            
+            assessment_type, question_count, learning_outcomes = section
 
-            print(f"Generating {section_name}...")
+            print(f"Generating Section {counter}...")
 
             if learning_outcomes == []:
                 exclude = True
@@ -148,7 +149,7 @@ class AssessmentGenerator:
             questions = self.get_quiz(username, assessment_type, question_count, learning_outcomes, exclude_questions=exclude, index=index)
             
             exam["sections"].append({
-                "name": section_name,
+                "name": f"Section {counter}",
                 "type": assessment_type,
                 "questions": questions["questions"]
             })
@@ -161,11 +162,9 @@ class AssessmentGenerator:
             #     existing_excluded_questions = existing_excluded_questions + "\n" + question["question"]
             # self.write_excluded_questions(excluded_questions_file_path, existing_excluded_questions)
 
+            counter += 1
+
             
         # self.write_excluded_questions(excluded_questions_file_path, "")
-
-        # Save exam to a json file
-        with open(fr'media\{username}\assessments\exam.json', 'w') as f:
-            json.dump(exam, f)
-        
+        print(exam)
         return exam

@@ -106,26 +106,38 @@ class Assessment(models.Model):
         # ['section_types'] = list i.e. ['multiple choice', 'true or false', 'essay']
         # ['section_lengths'] = list i.e. [5, 10, 15,]
         # ['learning_outcomes'] = list i.e. [['l_outcome 1.1', 'l_outcome 1.2',], ['l_outcome 2.1', 'l_outcome 2.2']]
-        print(section)
+        
+        exam_format = []
+
+        for i in range(len(section['section_types'])):
+            s_type = section['section_types'][i]
+            s_length = section['section_lengths'][i]
+            l_outcome = section['learning_outcomes'][i] if i < len(section['learning_outcomes']) else []
+
+            exam_format.append((s_type, s_length, l_outcome))
+
+        # API CALL
+        ai = assessment_generator.AssessmentGenerator()
+        exam = ai.get_exam(self.user.username, exam_format, self.lesson_path)
+        
+        section_list = {'sections': exam['sections']}
+        
         
         s_types = section['section_types']
         s_lengths = section['section_lengths']
         l_outcomes = section['learning_outcomes']
-        
-        # API CALL
-        ai = assessment_generator.AI()
-        exam = ai.get_exam(self.lesson, s_type, s_lengths, l_outcomes)
-        
-        section_list = {'sections': exam['sections']}
-        
-            
+
+        if l_outcomes == []:
+            l_outcomes = [[] for i in range(len(s_types))]
+
         for i, (s, s_l, l) in enumerate(zip(section_list['sections'], s_lengths, l_outcomes), start=1):
-            s_type = s['section_type'].lower()
+
+            s_type = s['type'].lower()
             print(f's_type: {s_type}')
             s_t = Question_Type.objects.get(type=s_type)
             sec = Section.objects.create(
                 section_no=i, 
-                name=s['section_name'],
+                name=s['name'],
                 length=s_l,
                 type=s_t, 
                 assessment=self
