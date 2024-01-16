@@ -75,12 +75,21 @@ class Assessment(models.Model):
                 section=s
             )
         for i, q in enumerate(questions_list['questions'], start=1):
-            question = Question.objects.create(
+            
+            if qt.type == 'essay' or qt.type == 'Essay':
+                question = Question.objects.create(
                 question_no=i,
                 question=q['question'],
-                answer=q['answer'],
+                answer=[],
                 section=s
-            )
+                )
+            else:
+                question = Question.objects.create(
+                    question_no=i,
+                    question=q['question'],
+                    answer=q['answer'],
+                    section=s
+                )
             if qt.type == 'multiple choice' or qt.type == 'Multiple Choice' or qt.type == 'true or false' or qt.type == 'True or False':
                 options_list = q['options']
                 for j, o in enumerate(options_list, start=1):

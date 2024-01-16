@@ -344,14 +344,9 @@ class AssessmentExportView(View):
                 
             question_dict['questions'] = question_data_list
             
-            # with open('question_dict.json', 'w') as f:
-            #     json.dump(question_dict, f)
-            # with open('question_dict.json', 'w') as f:
-            #     json.dump(question_dict, f)
-            
             if file_format == 'pdf':
-                Converter.quiz_to_pdf(assessment=question_dict, type=type, name=assessment.name)
-                Converter.quiz_answer_key(assessment=question_dict, type=type, name=assessment.name)
+                Converter.quiz_to_pdf(assessment=question_dict, type=type, name=assessment.name, username=username)
+                Converter.quiz_answer_key(assessment=question_dict, type=type, name=assessment.name, username=username)
                 """
                 if there is a custom file naming convention
                 
@@ -367,7 +362,10 @@ class AssessmentExportView(View):
                                           assessment_name=assessment.name)
                 """
             elif file_format == 'gift':
-                Converter.quiz_to_gift(json_data=question_dict, name=assessment.name)
+                Converter.quiz_to_gift(json_data=question_dict, name=assessment.name, username=username)
+            
+            elif file_format == 'word':
+                Converter.quiz_to_docx(assessment=question_dict, name=assessment.name, username=username)
         
         else:
             exam_dict = {'type': 'exam'}
@@ -424,7 +422,7 @@ class AssessmentExportView(View):
                 Converter.exam_to_gift(exam=exam_dict, output_file=None, name=assessment.name)
 
         
-        if file_format != 'gift':
+        if file_format == 'pdf':
             # Create the zip file
             file_path = rf'files\exports\{assessment.name}_assessment.zip'
             
@@ -446,9 +444,11 @@ class AssessmentExportView(View):
                         
                 zip_object.write(assessment_file_path, os.path.basename(assessment_file_path))
                 zip_object.write(answer_key_file_path, os.path.basename(answer_key_file_path))
-                                
+        
+        elif file_format == 'word':
+            pass
         else:
-            file_path = rf'{settings.MEDIA_ROOT}\files\exports\{assessment.name}_{assessment.type}-gift.txt'
+            file_path = rf"{username}\exports\{assessment.name}_{assessment.type}-gift.txt"
                         
         return download_file(request, file_path)
 

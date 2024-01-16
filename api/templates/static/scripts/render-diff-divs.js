@@ -35,7 +35,7 @@ function addNewSection() {
             <li onclick="selectOption(this)">True or False</li>
             <li onclick="selectOption(this)">Fill in The Blanks</li>
             <li onclick="selectOption(this)">Identification</li>
-            <li onclick="selectOption(this)">Esssay</li>
+            <li onclick="selectOption(this)">Essay</li>
             </ul>
         </div>
         

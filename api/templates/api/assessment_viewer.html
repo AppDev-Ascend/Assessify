@@ -46,43 +46,6 @@
     </nav>
   </body>
   <main class="generic-content-container">
-    
-      <!-- Using a script, populate this section with content according to their question types. -->
-      <!-- For ease, use the ID of the assessment and retrieve those questions associated with that ID. -->
-      <!-- This is how it looks in HTML code. -->
-
-      <!--
-        TEMPLATES TO USE:
-        - APPEND THEM WITHIN THE "assessment-container" div class.
-
-        - Generally used for both True or False questions and Multiple Choice questions:
-        - Represents a div showing an assessment section with 1 item containing 4 choices.
-        <div class="assessment-section">
-          <h2> Section ${section_number} </h2>
-          <ol class="choiced-items" type="1">
-            <li class="item"> ${question} <br/> <b> Answer: ${answer} </b>
-              <ol class="options" type="A">
-                <li> ${choice} </li>
-                <li> ${choice} </li>
-                <li> ${choice} </li>
-                <li> ${choice} </li>
-              </ol>
-            </li
-          <ol>
-        </div>
-
-        - Used for questions with no options at all:
-        - Represents a div showing an assessment section with 3 items without choices.
-          <div class="assessment-section">
-            <h2> Section ${section_number} </h2>
-            <ol class="choiced-items" type="1">
-            <ol class="non-choiced-item" type="1">
-              <li class="item"> ${question} <br/> <b> Answer: ${answer} </b></li>
-              <li class="item"> ${question} <br/> <b> Answer: ${answer} </b></li>
-              <li class="item"> ${question} <br/> <b> Answer: ${answer} </b></li>
-            </ol>
-          </div>
-      -->
       <div class="content-grid">
       {% if action == 'view' %}
         <div class="assessment-container">
@@ -97,14 +60,9 @@
               
               <ol class="choiced-items" type="1">
               {% for q in qg %}
-                  <li class="item"> {{ q.question.question }} <br/> 
-                  {% if q.question.answer != "" %}
-                      <b> Answer: {{ q.question.answer }} </b>
-                  </li>
-                  {% endif %}
+                  <li class="item"> {{ q.question.question }} <br/> </li>
+                  
 
-                  {% comment %} when true or false are included in options
-                  {% if qt.type == 'multiple choice' or qt.type == 'true or false' %} {% endcomment %}
                   {% if qt.type == 'Multiple Choice' %}
                     <ol class="options" type="A">
                         {% for o in q.options %}
@@ -113,14 +71,19 @@
                     </ol>
                   {% endif %}
 
+                  {% if qt.type != "Essay" %}
+                      <b> Answer: {{ q.question.answer }} </b>
+                  {% endif %}
+
               {% endfor %}
               </ol>
             {% endfor %}
             </div>
             <h3>
               <a href="{% url 'export_assessment' %}?as={{ assessment.pk }}&ff=pdf"> EXPORT (to PDF) </a>
-              <a href="{% url 'export_assessment' %}?as={{ assessment.pk }}&ff=gift" style="padding-left: 250px;"> EXPORT (to GIFT) </a>
-              <a href="{% url 'view_assessment' %}?as={{ assessment.pk }}&page=edit" style="padding-left: 250px;"> EDIT </a>
+              <a href="{% url 'export_assessment' %}?as={{ assessment.pk }}&ff=word" style="padding-left: 100px;"> EXPORT (to WORD) </a>
+              <a href="{% url 'export_assessment' %}?as={{ assessment.pk }}&ff=gift" style="padding-left: 100px;"> EXPORT (to GIFT) </a>
+              <a href="{% url 'view_assessment' %}?as={{ assessment.pk }}&page=edit" style="padding-left: 100px;"> EDIT </a>
             </h3>
           </div>
           
