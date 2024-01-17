@@ -1,0 +1,69 @@
+
+Page 1:
+
+Bridge Design Pattern
+Members: Daugdaug, Justine; Pandiyan, Janessa; Salera, Lance Vincent
+
+Definition
+
+The Bridge Design Pattern divides and organizes a single class that has multiple variants
+of some functionality into two hierarchies: abstractions and implementations. By doing this, the
+client code won’t be exposed to implementation details as it will only work with high level
+abstractions.
+
+History
+
+The bridge design pattern is one of the 23 design patterns introduced by the Gang of Four,
+composed of Erich Gamma, Richard Helm, Ralph Johnson, and John Vlissides, on a book called
+"Design Patterns: Elements of Reusable Object-Oriented Software", published on October 21,
+1994.
+
+Usages
+e Decoupling Interface and Implementation
+
+o Separate high-level logic from low-level operations.
+o Independent evolution of both parts.
+e Platform Independence
+o Operate across multiple platforms/environments.
+o Example: Different graphics rendering engines (DirectX, OpenGL).
+
+e Extensibility
+o Extend main logic and operations without mutual impact.
+o Add features without altering core functionality.
+e Dynamic Binding
+o Determine implementation at runtime.
+o Useful for plugin architectures and dynamic module loading.
+
+Real-world examples
+
+e The Bridge pattern allows e-commerce platforms to integrate multiple payment gateways
+without changing the checkout interface.
+
+e The Bridge Design Pattern is applicable to music player apps that handle many file
+formats. The Bridge pattern is used to separate the abstraction (the music player interface)
+from the implementation (file format handling) in this classic example.
+
+Pros
+
+e Cleaner Code
+
+o Separation of concerns leads to more organized and readable code.
+e = Maintainability
+
+o Changes in implementation don't affect the client code.
+
+e Scalability
+o Easily introduce new implementations without major code
+e Flexibility
+o Mix and match different implementations as needed.
+Cons
+e Complexity
+
+o When abstractions and implementations increase, the Bridge pattern might complicate
+a program. Code complexity can make it difficult to comprehend and maintain.
+
+e Multiple Indirections
+
+o Several indirections within an application has the potential to adversely impact its
+performance. This can be attributed to the inherent indirection that occurs when a
+request is passed from the Abstraction to the Implementor.

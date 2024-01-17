@@ -1,0 +1,1 @@
+How does the Abstract Factory Pattern facilitate the management of dependencies between multiple interrelated objects?

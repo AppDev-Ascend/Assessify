@@ -1,0 +1,2 @@
+What are other terms that are synonymous with the term 'proxy' in the context of the Proxy Design Pattern?
+Which book is known for documenting the Proxy Design Pattern?

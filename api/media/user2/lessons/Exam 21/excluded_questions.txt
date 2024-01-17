@@ -1,0 +1,5 @@
+What is the benefit of separating code into an invoker, command objects, and receiver?
+In the context of design patterns, what is the purpose of the Command Pattern?
+What is the role of Concrete Factories in the Abstract Factory Pattern?
+What method is used to ensure a class provides certain methods in the Abstract Factory Pattern?
+Which pattern is used to create families of related products?

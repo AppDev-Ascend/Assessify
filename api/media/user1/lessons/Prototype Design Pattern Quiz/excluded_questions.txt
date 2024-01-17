@@ -1,0 +1,2 @@
+What should be separated to implement the Command Pattern effectively?
+Which design pattern is best suited for creating families of related products?

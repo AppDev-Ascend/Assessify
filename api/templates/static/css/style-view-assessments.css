@@ -4,10 +4,7 @@
 }
 .content-grid {
     width: 100%;
-    display: grid;
     box-sizing: border-box;
-    grid-column-gap: 50px;
-    grid-template-columns: 0.70fr 0.30fr;
 }
 
 .assessment-section h2 {

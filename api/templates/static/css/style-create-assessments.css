@@ -94,24 +94,6 @@
     max-width: 450px;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 .dropdown-container {
     margin-bottom: 15px;
     position: relative;
@@ -146,23 +128,6 @@
   .dropdown-options li:hover {
     background-color: #ddd;
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   .custom-file-container {
     position: relative;
