@@ -1,0 +1,35 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<main class="layout layout--3">
+    <main class="content-container">
+        <div class="content-left">
+        </div>
+        <div class="content-right">
+          <div class="login-container">
+            <h1 align="center"> Sign In </h1>
+            <p align="center"> Welcome back! Ready to make assessments with us? <br> It's so good to have you back for more. </p>
+            <br/>
+            <form method="post" class="navbar-searchbar">
+              {% csrf_token %}
+              {{ form.non_field_errors }}
+              
+              <label> Email </label>
+              {{ form.email.errors }}
+              <input class="form-textbox" type="text" placeholder="John Doe" name="{{ form.email.name }}" size="55"> <br><br>
+              
+              <label> Password </label>
+              {{ form.password.errors }}
+              <input class="form-textbox" type="password" placeholder="Enter your password." name="{{ form.password.name }}" size="55"> <br><br>
+              
+              <br/><hr/>
+              
+              <p align="center"> Don't have an account yet? <a href="{% url 'register' %}">Sign up for free.</a> </p>
+              
+              <button class="generic-button" type="submit"> Sign In </button>
+           </form>
+          </div>
+        </div>
+      </main>
+</main>
+{% endblock content %}

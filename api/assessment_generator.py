@@ -1,8 +1,13 @@
 from dotenv import load_dotenv
 import openai
+import openai
 import os
 import json
 import time
+from llama_index.llms import OpenAI
+from llama_index import VectorStoreIndex, SimpleDirectoryReader, ServiceContext, StorageContext, load_index_from_storage
+class AssessmentGenerator:
+    
 from llama_index.llms import OpenAI
 from llama_index import VectorStoreIndex, SimpleDirectoryReader, ServiceContext, StorageContext, load_index_from_storage
 class AssessmentGenerator:
