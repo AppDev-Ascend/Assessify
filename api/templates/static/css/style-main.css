@@ -395,6 +395,7 @@ nav .nav-interactable:hover {
 .generic-form-textarea-variant:focus {
     outline: none;
 }
+
 .generic-button-variant {
     width: 35%;
     margin-top: 10px;
@@ -411,6 +412,7 @@ nav .nav-interactable:hover {
     transition: .3s;
     cursor: pointer;
 }
+
 .generic-button-variant-2 {
     width: 100%;
     padding: 10px;
@@ -425,6 +427,7 @@ nav .nav-interactable:hover {
     transition: .3s;
     cursor: pointer;
 }
+
 .generic-button-variant:hover, .generic-button-variant-2:hover {
     background-color: rgb(185, 185, 185);
 }
@@ -445,6 +448,7 @@ nav .nav-interactable:hover {
     grid-column-gap: 50px;
     grid-template-columns: 0.60fr 0.40fr;
 }
+
 .assessment-form h2 {
     font-size: 36px;
     line-height: 15px;
