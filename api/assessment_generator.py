@@ -97,12 +97,18 @@ class AssessmentGenerator:
       
         assessment_str = str(assessment)
         
-        lines = assessment_str.split(">>>")
         quiz = {
             "type": assessment_type,
             "questions": []
         }
+        
+        print(assessment_str)
 
+        if number_of_questions != 1:
+            lines = assessment_str.split(">>>")
+        else:
+            lines = assessment_str
+        
         excluded_questions = ""
 
         for line in lines:
