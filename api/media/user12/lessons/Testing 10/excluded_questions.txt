@@ -1,0 +1,10 @@
+The Abstract Factory Pattern is not suitable for systems that need to be configured with multiple families of related objects
+The Abstract Factory Pattern encapsulates product creation
+The Abstract Factory Pattern reduces complexity in systems with many product families
+The Abstract Factory Pattern ensures that created objects are compatible and belong to the same family
+ConcreteProductA1 and ConcreteProductB1 are examples of Concrete Factories
+The Abstract Factory Pattern can help manage dependencies between multiple interrelated objects
+The Client uses the abstract factory and abstract product interfaces to create families of related objects
+The Abstract Factory Pattern is useful for creating unrelated objects
+Concrete Products implement the interfaces defined by abstract products
+The Abstract Factory Pattern is a structural design pattern

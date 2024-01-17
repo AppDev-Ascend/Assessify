@@ -1,0 +1,1 @@
+What are the potential drawbacks of using the Abstract Factory Design Pattern in terms of complexity, especially with a large number of product families?

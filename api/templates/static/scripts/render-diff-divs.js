@@ -41,13 +41,7 @@ function addNewSection() {
         
         <label> Assessment Length </label>
         <div class="dropdown-container">
-            <input type="text" class="generic-form-textbox" placeholder="Select an option" onclick="toggleDropdown(this)" name="section-length_${sectionCounter}" readonly>
-            <ul class="dropdown-options">
-                <li onclick="selectOption(this)">5 Items (Pop Quiz Format)</li>
-                <li onclick="selectOption(this)">10 Items (Short Assessment Check)</li>
-                <li onclick="selectOption(this)">15 Items (Standard Assessments)</li>
-                <li onclick="selectOption(this)">30 Items (Comprehensive Assessment Checks)</li>
-            </ul>
+            <input type="number" class="generic-form-textbox" name="section-length_${sectionCounter}" min="1" max="20">
         </div>
 
         <label> Learning Outcomes: </label>

@@ -122,7 +122,6 @@ class Assessment(models.Model):
         
         section_list = {'sections': exam['sections']}
         
-        
         s_types = section['section_types']
         s_lengths = section['section_lengths']
         l_outcomes = section['learning_outcomes']

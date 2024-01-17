@@ -117,7 +117,8 @@ class CreateAssessmentView(View):
     
     def get(self, request):
         a_type = request.GET.get('type')
-        return render(request, self.template)
+
+        return render(request, self.template, context = {'assessment_type': a_type})
 
     def post(self, request):
         user_id = request.session['_auth_user_id']

@@ -52,7 +52,7 @@ class AssessmentGenerator:
                                 Respond only with the output in the exact format specified, with no explanation or conversation.'
 
             case "Identification" | "identification" | "True or False" | "true or false":
-                question = "term identification question where the answer are important terms" if assessment_type == "Identification" else "true or false questions"
+                question = "term identification question where the answer are important terms" if assessment_type.lower() == "identification" else "true or false questions"
                 response_format = 'The result type should be provided in the following JSON data structure:\n\
                                 {\
                                     "question": "Question", \
@@ -87,8 +87,8 @@ class AssessmentGenerator:
             my_prompt = f"Generate {number_of_questions} {question} that is aligned with these learning outcomes: \n\n{formatted_learning_outcomes}.\n\n{response_format}"
         
         if exclude_questions == True:
-            existing_excluded_questions = self.read_excluded_questions(fr'media\{username}\lessons\excluded_questions.txt')
-            my_prompt = my_prompt + f"\n\nMake sure that these questions are excluded: \n\n{existing_excluded_questions}."
+            existing_excluded_questions = self.read_excluded_questions(fr'{lesson_path}\excluded_questions.txt')
+            my_prompt = my_prompt + f"\n\nPlease ensure to avoid creating questions similar to the following: \n\n{existing_excluded_questions}"
         
         print("Prompt: ", my_prompt)
 
@@ -103,13 +103,19 @@ class AssessmentGenerator:
             "questions": []
         }
 
+        excluded_questions = ""
+
         for line in lines:
             if line != "":
                 question = json.loads(line)
                 quiz["questions"].append(question)
 
                 if exclude_questions == True:
-                    self.write_excluded_questions(fr'media\{username}\lessons\excluded_questions.txt', question["question"])
+                    excluded_questions = question["question"] + "\n" + excluded_questions
+        
+        if exclude_questions == True and assessment_type in ["Multiple Choice", "multiple choice", "Identification", "identification", "Essay", "essay"]:
+            exclude_questions = excluded_questions + self.read_excluded_questions(fr'{lesson_path}\excluded_questions.txt')
+            self.write_excluded_questions(fr'{lesson_path}\excluded_questions.txt', excluded_questions)
 
         return quiz
     
@@ -119,15 +125,8 @@ class AssessmentGenerator:
 
         os.makedirs(fr'media\{username}\lessons', exist_ok=True)
         
-        if lesson == "":
-                print("Loading the Documents")
-                documents = SimpleDirectoryReader(fr"media\{username}\lessons").load_data()
-        else:
-            print("Storing the Lesson")
-            with open(fr'media\{username}\lessons\lesson.txt', 'w') as f:
-                f.write(lesson)
-            documents = SimpleDirectoryReader(lesson).load_data()
         
+        documents = SimpleDirectoryReader(lesson).load_data()
         index = VectorStoreIndex.from_documents(documents, service_context=self.service_context)
 
         exam = {
@@ -136,7 +135,7 @@ class AssessmentGenerator:
         }
         counter = 1
         for section in exam_format:
-            
+            print(section)
             assessment_type, question_count, learning_outcomes = section
 
             print(f"Generating Section {counter}...")
@@ -146,7 +145,7 @@ class AssessmentGenerator:
             else:
                 exclude = False
 
-            questions = self.get_quiz(username, assessment_type, question_count, learning_outcomes, exclude_questions=exclude, index=index)
+            questions = self.get_quiz(username, assessment_type, question_count, learning_outcomes, lesson_path=lesson, exclude_questions=exclude, index=index)
             
             exam["sections"].append({
                 "name": f"Section {counter}",
@@ -154,17 +153,8 @@ class AssessmentGenerator:
                 "questions": questions["questions"]
             })
 
-            # # Add excluded questions
-            # excluded_questions_file_path = r'media\lessons\excluded_questions.txt'
-            # existing_excluded_questions = self.read_excluded_questions(excluded_questions_file_path)
-
-            # for question in questions["questions"]:
-            #     existing_excluded_questions = existing_excluded_questions + "\n" + question["question"]
-            # self.write_excluded_questions(excluded_questions_file_path, existing_excluded_questions)
-
             counter += 1
 
-            
-        # self.write_excluded_questions(excluded_questions_file_path, "")
         print(exam)
+
         return exam
