@@ -230,7 +230,6 @@ label {
 .generic-textarea-variant2:focus {
     outline: none;
 }
-
 @keyframes fade {
     0%, 100% {
       opacity: 0;

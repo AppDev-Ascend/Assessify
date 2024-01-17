@@ -32,11 +32,11 @@
           <h1> My Assessments </h1>
         </div>
 
-        <form class="right-header">
+        <!-- <form class="right-header">
           <input class="generic-form-textbox" type="text" placeholder="Search for assessments you've made..." name="search_query">
           <img class="non-interactable-placeholder" src="static/media/sort-by.png" width="32" height="32"/>
           <img class="non-interactable-placeholder" src="static/media/grid-view.png" width="32" height="32"/>
-        </form>
+        </form> -->
       </div>
 
       <!-- Container for individual assessment boxes. -->
@@ -44,13 +44,11 @@
 
         {% for assessment in assessments %}
         <a href="{% url 'view_assessment' %}?as={{ assessment.pk }}&page=view">
-        <div class="assessment-grid-container">
-          <div class="assessment-box">
-            <div class="assessment-description">
-              <h2> {{ assessment.name }} </h2>
-              <p> {{ assessment.type }} | {{ assessment.no_of_questions }} | {{ assessment.date_created }} </p>
-              <p> {{ assessment.description }} </p>
-            </div>
+        <div class="assessment-box">
+          <div class="assessment-description">
+            <h2> {{ assessment.name }} </h2>
+            <p> {{ assessment.type }} | {{ assessment.no_of_questions }} | {{ assessment.date_created }} </p>
+            <p> {{ assessment.description }} </p>
           </div>
         </div>
         </a>

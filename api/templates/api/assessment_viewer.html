@@ -51,12 +51,19 @@
         <div class="assessment-container">
           <div class="assessment-section">
             <h1> {{ assessment.name }} </h1>
+            <h4>Description: </h4>
             <p> {{ assessment.description }} </p>
             {% for s, qt, qg in assessment_data %}
-              Section {{ s.section_no}}
-              <h2> {{ s.name }} </h2>
-              <h4> {{ qt.type }} </h4>
-              {{ s.description }}
+              
+              {% if assessment.type == 'quiz' %}
+                <h2> {{ qt.type }} </h2>
+                {{ s.description }}
+              {% else %}
+                <h2> {{ s.name }} </h2>
+                <h4> {{ qt.type }} </h4>
+                {{ s.description }}
+              {% endif %}
+              
               
               <ol class="choiced-items" type="1">
               {% for q in qg %}
