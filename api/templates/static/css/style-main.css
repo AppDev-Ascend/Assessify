@@ -18,6 +18,15 @@ body {
     width: 100%;
     background-color: rgb(250, 250, 255);
 }
+a:link, a:visited {
+    text-decoration: none;
+    color: black;
+}
+label {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
 
 .nav-container {
     top: 0;
@@ -25,27 +34,29 @@ body {
     height: 58px;
     min-height: 56px;
     max-height: 70px;
+    padding: 0px 55px 0px 55px;
     display: flex;
     position: fixed;
     z-index: 1;
     font-family: 'Signika';
     background-color: rgb(255, 255, 255);
-    border-bottom: 2px solid rgb(206, 206, 206);
+    border-bottom: 1px solid rgba(206, 206, 206, 0.75);
     box-shadow: 0px 0px 10px 10px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box;
 }
 nav .navbar-div-left {
     width: 50%;
-    padding-left: 25px;
     display: flex;
     justify-content: left;
     align-items: center;
+    box-sizing: border-box;
 }
 nav .navbar-div-right {
     width: 50%;
-    padding-right: 25px;
     display: flex;
     justify-content: right;
     align-items: center;
+    box-sizing: border-box;
 }
 nav .nav-element {
     padding: 15px 25px 15px 25px;
@@ -59,23 +70,28 @@ nav .nav-interactable:link, .nav-interactable:active {
     text-decoration: none;
 }
 nav .nav-interactable:hover {
-    border-bottom: 3px rgb(59, 255, 75) solid;
+    border-bottom: 3px rgb(6, 209, 23) solid;
     transition: .2s;
 }
 
-.content-container {
-    margin-top: 60px;
-    display: flex;
-    font-family: 'Raleway';
+.generic-content-container {
+    margin-top: 58px;
 }
-.content-container h1 {
+.generic-content-container h1 {
     font-size: 64px;
     line-height: 10px;
-    margin-top: 0px;
     font-weight: bolder;
 }
-.content-container h3 {
-    line-height: 0px;
+.generic-form-textbox {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 2px solid rgb(230, 230, 230);
+    box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.05);
+    font-family: 'Segoe UI';
+    box-sizing: border-box;
+    outline: none;
 }
 .generic-button {
     width: 100%;
@@ -98,51 +114,180 @@ nav .nav-interactable:hover {
 .generic-button:active {
     background-color: rgb(3, 240, 23);
 }
-main .content-left {
-    width: 65%;
-    height: 92.3vh;      /* hardcoded value = evil, change it asap, fixable with js only */
-    background-image: url("../media/placeholder.png");
-    background-repeat: no-repeat;
-    background-size: cover;
-    animation: fade 5s ease-in-out infinite;
-}
-main .content-right {
-    width: 35%;
-    display: flex;
-    align-items: center;
-}
-main .content-right .register-container {
+
+.prompt-container {
     display: none;
-    padding: 60px;
+    width: 600px;
+    max-width: 600px;
+    display: none;
+    position: fixed;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    font-family: 'Raleway';
+    z-index: 1000;
 }
-main .content-right .login-container {
-    /*display: none;*/
-    padding: 60px;
+.prompt-container h1 {
+    font-size: 38px;
+    font-weight: bolder;
+    margin: 0px;
 }
-input.form-textbox {
-    padding: 9px;
-    border: 1px gray solid;
-    border-radius: 10px;
+.prompt-container p {
+    text-align: center;
 }
-input.form-textbox:focus {
-    outline: none;
-    border: 2px solid green;
+.prompt-container .options-container {
+    width: 100%;
+    margin-top: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
 }
-label {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 5px;
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+.tier {
+    margin: 0px 20px 0px 20px;
+    padding: 5px 25px 5px 25px;
+    border: 1px solid purple;
+    border-radius: 20px;
+    background-color: purple;
+    color: white;
+    font-weight: bolder;
 }
 
 .generic-content-container {
-    padding: 75px 125px 75px 125px;
+    margin: 0px;
+    width: 100%;
+    font-family: 'Raleway';
+    box-sizing: border-box;
+}
+
+.content-slideshow-container {
+    width: 65%;
+    max-height: 100vh;
+    overflow: hidden;
+}
+.content-slideshow-container .slideshow-image {
+    display: none;
+    transition: opacity 1s ease-in-out;
+    animation: fade 10s ease-in-out infinite;
+}
+.content-slideshow-container .slideshow-image img {
+    height: 100vh;
+    width: auto;
+    max-width: 100%;
+    object-fit: cover;
+    box-sizing: border-box;
+    z-index: -1;;
+}
+
+.content-form-container {
+    height: 100%;
+    width: 35%;
+    margin-top: 56px;
+    padding: 45px;
+}
+.content-form-container #register-container {
+    display: block;
+}
+.content-form-container #login-container {
+    display: none;
+}
+
+.register-container .container-form {
+    margin: 10px 0px 0px 0px;
+}
+.container-form label {
+    display: block;
+}
+.container-form .generic-form-textbox:focus {
+    border: 2px solid green;
+}
+.container-footer a:hover, a:visited, a:link {
+    text-decoration: none;
+    color: black;
+}
+
+.generic-content-container {
+    padding: 50px 125px 50px 125px;
     font-family: 'Raleway';
 }
-.generic-content-container h1 {
-    font-size: 64px;
-    line-height: 10px;
-    font-weight: bolder;
+.generic-form-textbox {
+    width: 75%;
+    margin-bottom: 0;
+    padding: 10px;
+    border-radius: 10px;
+    border: 2px solid rgb(230, 230, 230);
+    box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.05);
+    font-family: 'Segoe UI';
+    box-sizing: border-box;
+    outline: none;
 }
+.generic-button-variant {
+    width: 100%;
+    margin-top: 20px;
+    padding: 15px 20px 15px 20px;
+    font-family: Segoe UI;
+    text-align: center;
+    background-color: transparent;
+    color: rgb(255, 255, 255);
+    text-decoration: none;
+    background-color: rgb(2, 158, 15);
+    border: none;
+    outline: none;
+    border-radius: 20px;
+    transition: .3s;
+    cursor: pointer;
+}
+.generic-button:hover {
+    background-color: rgb(4, 192, 20);
+}
+.generic-button:active {
+    background-color: rgb(3, 240, 23);
+}
+.non-interactable-placeholder {
+    margin: 0px 0px 0px 10px;
+}
+
+.content-header {
+    display: flex;
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+.content-header h1 {
+    margin-left: 15px;
+}
+.content-header .left-header {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    box-sizing: border-box;
+}
+.content-header .right-header {
+    width: 55%;
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    box-sizing: border-box;
+}
+
 .assessment-grid-container {
     width: 100%;
     display: grid;
@@ -153,9 +298,9 @@ label {
 .assessment-box {
     display: inline-block;
     width: 100%;
-    height: 300px;
+    height: 345px;
     max-width: 100%;
-    max-height: 300px;
+    max-height: 345px;
     padding: 25px;
     border: 1px solid rgb(201, 201, 201);
     background-color: rgb(255, 255, 255);
@@ -170,12 +315,12 @@ label {
 .assessment-create-box {
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
-    justify-items: center;
     width: 100%;
-    height: 300px;
+    height: 345px;
     max-width: 100%;
-    max-height: 300px;
+    max-height: 345px;
     padding: 25px;
     border: 1px dashed rgb(58, 58, 58);
     border-radius: 20px;
@@ -186,38 +331,59 @@ label {
 .assessment-create-box:hover {
     background-color: rgb(255, 255, 255);
     border: 2px solid greenyellow;
-}
-
-.assessment-creator-container {
-    width: 100%;
-    display: grid;
-    box-sizing: border-box;
-    grid-column-gap: 50px;
-    grid-template-columns: 0.65fr 0.35fr;
-}
-.assessment-attributes-form {
-    width: 100%;
-    height: 100%;;
-    box-sizing: border-box;
-}
-.assessment-generator-form {
     box-sizing: border-box;
 }
 
-.generic-textbox {
-    width: 100%;
-    padding: 5px;
+.assessment-box .assessment-title {
+    max-height: 75px;
+    overflow: hidden; 
+}
+.assessment-box .assessment-title h2 {
+    margin-top: 10px;
+    margin-bottom: 10px;
     box-sizing: border-box;
 }
-.generic-textarea-variant1 {
-    width: 100%;
-    padding: 5px;
-    resize: none;
-    box-sizing: border-box;
+
+/*I don't want to deal with this spacing and overflow **** when time is this low so I'm cheapskating this and the title's part.*/
+.assessment-box .assessment-description {
+    max-height: 150px;
+    margin-top: 20px;
+    overflow: hidden;
 }
-.generic-textarea-variant2 {
+
+.options-container .option-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     width: 100%;
-    height: 100%;
+    max-width: 100%;
+    padding: 25px;
+    border: 1px solid rgb(201, 201, 201);
+    border-radius: 20px;
+    box-sizing: border-box;
+    transition: .2s;
+    box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.05);
+}
+.options-container .option-box:hover {
+    transform: scale(1.035);
+}
+
+.options-container .option-box h2 {
+    margin: 0;
+}
+
+.bruh {
+    width: 50px;
+}
+
+.generic-content-container {
+    padding: 50px 125px 10px 125px;
+    font-family: 'Raleway';
+}
+.generic-form-textarea-variant {
+    width: 100%;
+    height: 350px;
     padding: 20px;
     border-radius: 10px;
     border: 1px solid rgb(230, 230, 230);
@@ -226,18 +392,181 @@ label {
     resize: none;
     box-sizing: border-box;
 }
-.generic-textarea-variant1:focus {
+.generic-form-textarea-variant:focus {
     outline: none;
 }
-.generic-textarea-variant2:focus {
+.generic-button-variant {
+    width: 35%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 5px;
+    font-family: Segoe UI;
+    text-align: center;
+    background-color: transparent;
+    color: rgb(255, 255, 255);
+    background-color: rgb(121, 121, 121);
+    border: none;
     outline: none;
+    border-radius: 20px;
+    transition: .3s;
+    cursor: pointer;
+}
+.generic-button-variant-2 {
+    width: 100%;
+    padding: 10px;
+    font-family: Segoe UI;
+    text-align: center;
+    background-color: transparent;
+    color: rgb(255, 255, 255);
+    background-color: rgb(121, 121, 121);
+    border: none;
+    outline: none;
+    border-radius: 20px;
+    transition: .3s;
+    cursor: pointer;
+}
+.generic-button-variant:hover, .generic-button-variant-2:hover {
+    background-color: rgb(185, 185, 185);
+}
+
+.content-header {
+    margin-bottom: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.assessment-form {
+    width: 100%;
+    display: grid;
+    box-sizing: border-box;
+    grid-column-gap: 50px;
+    grid-template-columns: 0.60fr 0.40fr;
+}
+.assessment-form h2 {
+    font-size: 36px;
+    line-height: 15px;
+    margin-bottom: 0px;
+}
+.submit-form-button {
+    margin-top: 25px;
+    padding: 20px 250px 20px 250px;
+    grid-row: 2;
+    grid-column: span 2;
+}
+
+#section-add-button {
+    display: none;
+}
+.assessment-section {
+    margin-top: 15px;
+    padding: 10px 25px 10px 25px;
+    border: 3px solid rgb(236, 236, 236);
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+.prompt-container {
+    padding: 30px;
+    max-width: 450px;
+}
+
+.dropdown-container {
+    margin-bottom: 15px;
+    position: relative;
+    display: block;
+}
+
+  /* Styling for the input field */
+.dropdown-input {
+    padding: 10px;
+    width: 200px;
+}
+
+  /* Styling for the dropdown options */
+.dropdown-options {
+    display: none;
+    position: absolute;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+  /* Styling for the dropdown options list items */
+.dropdown-options li {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #f9f9f9;
+}
+
+  /* Styling for the dropdown options list items on hover */
+.dropdown-options li:hover {
+    background-color: #ddd;
+}
+
+.custom-file-container {
+    position: relative;
+    width: 300px;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.custom-file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.custom-file-button {
+    border-radius: 5px;
+    background-color: #439746;
+    color: #fff;
+    padding: 10px;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.custom-file-name {
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.generic-content-container {
+    padding: 50px 125px 10px 125px;
+    font-family: 'Raleway';
+}
+.content-grid {
+    width: 100%;
+    display: grid;
+    box-sizing: border-box;
+    grid-column-gap: 50px;
+    grid-template-columns: 0.70fr 0.30fr;
+}
+
+.assessment-section h2 {
+    font-size: 42px;
+    margin-bottom: 5px;
+}
+.assessment-section li {
+    font-size: 20px;
+}
+.assessment-section li.item {
+    margin: 30px 0px 30px 0px;
+    font-size: 20px;
+}
+.assessment-section .options li {
+    margin: 10px 0px 10px 0px;
 }
 
 @keyframes fade {
-    0%, 100% {
-      opacity: 0;
-    }
-    25%, 75% {
-      opacity: 1;
-    }
+    0%, 100% { opacity: 0; }
+    15%, 75% { opacity: 1; }
 }

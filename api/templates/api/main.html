@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="keywords" content="Assessify">
+        <meta name="description" content="Assessify login and register page, sign up now!">
+        <meta name="author" content="Ascend">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title> My Assessments | Assessify </title>
+        <link rel="icon" href="static/media/favicon.png">
+        <link rel="stylesheet" href="{% static 'css/style-main.css' %}">
+        <script src="static/scripts/script.js"></script>
+    </head>
+
+  <body>
+    {% include 'navbar.html'%}
+
+    {% block content %}
+        {% if messages %}
+            <ul class="messages">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+            {% endif %}
+    {% endblock %}
+    <script src="{% static 'js/script.js' %}"></script>
+  </body>
+</html>

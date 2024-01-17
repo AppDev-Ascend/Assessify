@@ -144,7 +144,7 @@ class CreateAssessmentView(View):
                     section_types.append(value.lower().lstrip())
 
                 elif key.startswith('section-length'):
-                    num = int(value.split(' ')[0])
+                    num = int(value)
                     section_lengths.append(num)
                     no_of_questions += num
                 

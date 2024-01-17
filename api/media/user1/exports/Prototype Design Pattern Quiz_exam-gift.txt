@@ -1,0 +1,11 @@
+::Section::Section 1::Multiple Choice::
+::Question::Which design pattern is best suited for creating families of related products??
+~ Singleton Pattern
+~ Abstract Factory Pattern
+~ Builder Pattern
+~ Prototype Pattern
+::Question::What should be separated to implement the Command Pattern effectively??
+~ Invoker, Command Objects, Receiver
+~ Concrete Factories, Abstract Products
+~ Operation Methods, Abstract Methods
+~ Product Interfaces, Factory Interfaces

@@ -60,7 +60,7 @@ ROOT_URLCONF = 'AppDevFinalProject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "templates"],
+        'DIRS': [BASE_DIR / "api/templates/api"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

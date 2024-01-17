@@ -110,6 +110,7 @@ class Assessment(models.Model):
         exam_format = []
 
         for i in range(len(section['section_types'])):
+            
             s_type = section['section_types'][i]
             s_length = section['section_lengths'][i]
             l_outcome = section['learning_outcomes'][i] if i < len(section['learning_outcomes']) else []
