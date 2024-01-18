@@ -50,7 +50,6 @@ class Assessment(models.Model):
         # ['section_types'] = list i.e. ['multiple choice']
         # ['section_lengths'] = list i.e. [5]
         # ['learning_outcomes'] = list i.e. ['l_outcome 1.1', 'l_outcome 1.2', 'l_outcome 1.3']
-        print(section)
         
         s_type = section['section_types'][0]
         s_length = section['section_lengths'][0]
@@ -90,7 +89,7 @@ class Assessment(models.Model):
                     answer=q['answer'],
                     section=s
                 )
-            if qt.type.lower() in ['multiple choice', 'true or false']:
+            if qt.type.lower() in ['multiple choice']:
                 options_list = q['options']
                 for j, o in enumerate(options_list, start=0):
                     option = Option.objects.create(

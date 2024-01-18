@@ -1,0 +1,1 @@
+What is the term for the component in the Interpreter Design Pattern that contains information global to the interpreter?

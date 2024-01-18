@@ -1,0 +1,25 @@
+::Question::What is the primary mechanism for creating objects in the Prototype Design Pattern??
+~ Instantiation using constructors
+~ Cloning an existing instance
+~ Deserialization of object state
+~ Invoking a static factory method
+::Question::What does the Prototype Interface in the Prototype Design Pattern declare??
+~ A method for serialization
+~ A method for cloning
+~ A constructor signature
+~ A method for object disposal
+::Question::Which of the following best describes a Concrete Prototype in the context of the Prototype Design Pattern??
+~ A class that cannot be instantiated
+~ A class that provides the actual implementation of the clone method
+~ A class that only contains abstract methods
+~ A class that serves as a factory for object creation
+::Question::What is the role of the Client in the Prototype Design Pattern??
+~ To define the clone method
+~ To initialize new objects
+~ To initiate the cloning process
+~ To implement the prototype interface
+::Question::Which of the following is a use case for the Prototype Design Pattern??
+~ When object creation is less efficient by copying
+~ When reducing subclassing is not a concern
+~ When configuring complex objects with different properties
+~ When a single instance of an object is required

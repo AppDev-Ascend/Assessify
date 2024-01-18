@@ -1,0 +1,1 @@
+How does the Abstract Factory Design Pattern ensure the consistency of objects created within a family?

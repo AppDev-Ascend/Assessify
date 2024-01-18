@@ -15,12 +15,8 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.db.utils import IntegrityError
 
-
 from django.contrib.auth import authenticate, login
 
-
-from .validations import login_validation, register_validation, validate_assessment
-from .forms import AssessmentForm, RegisterForm, LoginForm, AssessmentAddForm, AssessmentQuestionForm, AssessmentOptionForm
 from .converter import Converter
 from .models import Assessment, Question_Type, User, Question, Option, Section
 from .file_handler import download_file, handle_uploaded_file, handle_non_utf8
@@ -141,7 +137,7 @@ class CreateAssessmentView(View):
             for key, value in request.POST.items():
                 
                 if key.startswith('section-type'):
-                    section_types.append(value.lower().lstrip())
+                    section_types.append(value.lstrip())
 
                 elif key.startswith('section-length'):
                     num = int(value)
@@ -149,6 +145,7 @@ class CreateAssessmentView(View):
                     no_of_questions += num
                 
                 elif key.startswith('learning-outcomes'):
+                    print(value)
                     learning_outcomes.append(value)
         
         elif assessment_type == 'exam':
@@ -471,4 +468,3 @@ class AssessmentsView(View):
     def post(self, request):
         return 
     
-

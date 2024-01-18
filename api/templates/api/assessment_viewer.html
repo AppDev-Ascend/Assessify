@@ -79,13 +79,16 @@
                   {% endif %}
 
                   {% if qt.type != "Essay" %}
-                      <b> Answer: {{ q.question.answer }} </b>
+                      <br>
+                      <b class="answer"> Answer: {{ q.question.answer }} </b>
                   {% endif %}
 
               {% endfor %}
               </ol>
             {% endfor %}
             </div>
+            <br>
+            <br>
             <h3>
               <a href="{% url 'export_assessment' %}?as={{ assessment.pk }}&ff=pdf"> EXPORT (to PDF) </a>
               <a href="{% url 'export_assessment' %}?as={{ assessment.pk }}&ff=word" style="padding-left: 100px;"> EXPORT (to WORD) </a>

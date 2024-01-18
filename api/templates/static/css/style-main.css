@@ -117,8 +117,8 @@ nav .nav-interactable:hover {
 
 .prompt-container {
     display: none;
-    width: 600px;
-    max-width: 600px;
+    width: 800px;
+    max-width: 800px;
     display: none;
     position: fixed;
     flex-direction: column;
@@ -128,7 +128,7 @@ nav .nav-interactable:hover {
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: #fff;
-    padding: 20px;
+    padding: 30px;
     border: 1px solid #ccc;
     border-radius: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
@@ -242,7 +242,6 @@ nav .nav-interactable:hover {
 }
 .generic-button-variant {
     width: 100%;
-    margin-top: 20px;
     padding: 15px 20px 15px 20px;
     font-family: Segoe UI;
     text-align: center;
@@ -397,8 +396,8 @@ nav .nav-interactable:hover {
 }
 
 .generic-button-variant {
-    width: 35%;
-    margin-top: 10px;
+    width: 100%;
+    margin-top: 30px;
     margin-bottom: 10px;
     padding: 5px;
     font-family: Segoe UI;
@@ -472,10 +471,6 @@ nav .nav-interactable:hover {
     box-sizing: border-box;
 }
 
-.prompt-container {
-    padding: 30px;
-    max-width: 450px;
-}
 
 .dropdown-container {
     margin-bottom: 15px;
