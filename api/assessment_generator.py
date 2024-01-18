@@ -134,49 +134,61 @@ class AssessmentGenerator:
                                     Respond only with the output in the exact format specified, with no explanation or conversation or other text that wraps it or says it is a json.\n \
                                     Do not wrap it with ```json ``` or ```json\n```'
 
-        # Format for the prompt
-        if learning_outcomes == [] or learning_outcomes == None:
-            my_prompt = f"Generate {number_of_questions} {question}.\n\n{response_format}"
-        else:
-            formatted_learning_outcomes = "\n".join(learning_outcomes)
-            my_prompt = f"Generate {number_of_questions} {question} that is aligned with these learning outcomes: \n\n{formatted_learning_outcomes}.\n\n{response_format}"
-        
-        if exclude_questions == True:
-            existing_excluded_questions = self.read_excluded_questions(fr'{lesson_path}\excluded_questions.txt')
-            my_prompt = my_prompt + f"\n\nPlease ensure to avoid creating questions similar to the following: \n\n{existing_excluded_questions}"
-        
-        print("Prompt: ", my_prompt)
+        questions_left = number_of_questions
 
-        query_engine = index.as_query_engine()
-        assessment = query_engine.query(my_prompt)
-      
-        assessment_str = str(assessment)
-        
         quiz = {
-            "type": assessment_type,
-            "questions": []
-        }
-        
-        print(assessment_str)
+                "type": assessment_type,
+                "questions": []
+            }
 
-        
-        excluded_questions = ""
+        while questions_left > 0:
+            if questions_left  >= 10:
+                generate_questions = 10
+            else:
+                generate_questions = questions_left
 
-        if number_of_questions != 1:
-            lines = assessment_str.split(">>>")
-            for line in lines:
-                if line != "":
-                    question = json.loads(line)
-                    quiz["questions"].append(question)
-
-                    if exclude_questions == True:
-                        excluded_questions = question["question"] + "\n" + excluded_questions
-        else:
-            question = json.loads(assessment_str)
-            quiz["questions"].append(question)
-
+            # Format for the prompt
+            if learning_outcomes == [] or learning_outcomes == None:
+                my_prompt = f"Generate {generate_questions} {question}.\n\n{response_format}"
+            else:
+                formatted_learning_outcomes = "\n".join(learning_outcomes)
+                my_prompt = f"Generate {generate_questions} {question} that is aligned with these learning outcomes: \n\n{formatted_learning_outcomes}.\n\n{response_format}"
+            
             if exclude_questions == True:
-                    excluded_questions = question["question"] + "\n" + excluded_questions
+                existing_excluded_questions = self.read_excluded_questions(fr'{lesson_path}\excluded_questions.txt')
+                my_prompt = my_prompt + f"\n\nPlease ensure to avoid creating questions similar to the following: \n\n{existing_excluded_questions}"
+            
+            print("Prompt: ", my_prompt)
+
+            query_engine = index.as_query_engine()
+            assessment = query_engine.query(my_prompt)
+        
+            assessment_str = str(assessment)
+            
+            
+            
+            print(assessment_str)
+
+            
+            excluded_questions = ""
+
+            if number_of_questions != 1:
+                lines = assessment_str.split(">>>")
+                for line in lines:
+                    if line != "":
+                        question_json = json.loads(line)
+                        quiz["questions"].append(question_json)
+
+                        if exclude_questions == True:
+                            excluded_questions = question["question"] + "\n" + excluded_questions
+            else:
+                question = json.loads(assessment_str)
+                quiz["questions"].append(question_json)
+
+                if exclude_questions == True:
+                        excluded_questions = question["question"] + "\n" + excluded_questions
+            
+            questions_left -= 10
 
       
         

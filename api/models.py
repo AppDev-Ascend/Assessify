@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser
 from . import assessment_generator
@@ -45,6 +45,7 @@ class Assessment(models.Model):
     def __str__(self):
         return self.name
 
+    @transaction.atomic
     def create_quiz(self, section):
         # section consists of:
         # ['section_types'] = list i.e. ['multiple choice']
@@ -83,12 +84,14 @@ class Assessment(models.Model):
                 section=s
                 )
             else:
+                print(q)
                 question = Question.objects.create(
                     question_no=i,
                     question=q['question'],
                     answer=q['answer'],
                     section=s
                 )
+                
             if qt.type.lower() in ['multiple choice']:
                 options_list = q['options']
                 for j, o in enumerate(options_list, start=0):
@@ -100,6 +103,7 @@ class Assessment(models.Model):
 
         return self
     
+    @transaction.atomic
     def create_exam(self, section):
         # section consists of:
         # ['section_types'] = list i.e. ['multiple choice', 'true or false', 'essay']

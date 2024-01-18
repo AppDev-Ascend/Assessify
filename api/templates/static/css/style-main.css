@@ -77,11 +77,7 @@ nav .nav-interactable:hover {
 .generic-content-container {
     margin-top: 58px;
 }
-.generic-content-container h1 {
-    font-size: 64px;
-    line-height: 10px;
-    font-weight: bolder;
-}
+
 .generic-form-textbox {
     width: 100%;
     margin-bottom: 10px;

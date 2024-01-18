@@ -22,6 +22,7 @@ from .models import Assessment, Question_Type, User, Question, Option, Section
 from .file_handler import download_file, handle_uploaded_file, handle_non_utf8
 
 from django.views.generic.base import View
+from django.db import transaction
 
 
 # Notes:
@@ -116,6 +117,7 @@ class CreateAssessmentView(View):
 
         return render(request, self.template, context = {'assessment_type': a_type})
 
+    @transaction.atomic
     def post(self, request):
         user_id = request.session['_auth_user_id']
         user = User.objects.get(pk=user_id)

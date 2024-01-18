@@ -120,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Change some elements to accomodate the assessment type.
     if (creationType === 'exam') {
-        title.textContent = 'Create Examination Type Assessment';
+        title.textContent = 'Create Exam Type Assessment';
         subtitle.textContent = 'Exams are a comprehensive assessment on multiple topics. Recommended for long form assessments.';
         sectionButton.style.display = 'block';
         icon.src = "../media/exam-icon.png";
