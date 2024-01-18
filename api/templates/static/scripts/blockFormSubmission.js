@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", function() {
         if (textarea.value.trim() !== "") { materialsProvided = true; }
 
         if (allFilled === false || materialsProvided === false) {
-            event.preventDefault();
             displayErrorPopup();
         }
     });

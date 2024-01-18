@@ -8,11 +8,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> Create Assessment | Assessify </title>
     <link rel="icon" href="static/media/favicon.png">
+    <link rel="stylesheet" href="static/css/style-main.css">
     <link rel="stylesheet" href="static/css/style-global.css">
     <link rel="stylesheet" href="static/css/style-create-assessments.css">
     <script src="static/scripts/script.js"></script>
     <script src="static/scripts/render-diff-divs.js"></script>
-    <script src="static/scripts/blockFormSubmission.js"></script>
   </head>
   <body>
     <nav class="nav-container">
@@ -81,6 +81,7 @@
       
           <label> Assessment Length </label>
           <div class="dropdown-container">
+            <p>20 questions max</p>
             <input type="number" class="generic-form-textbox" name="section-length_{{ sectionCounter }}" min="1" max="20">
           </div>
 
@@ -100,7 +101,7 @@
       </div>
     </form>
 
-    <div id="promptContainer" class="prompt-container">
+    <div id="promptContainer" class="prompt-container" style="display: None;">
       <h1 style="margin-bottom: 15px;"> Incomplete Data! </h1><br/><br/>
       <img src="static/media/error.gif"/>
       <p> It seems like you have not properly filled-up all of the required data to create an assessment just yet. </p>
