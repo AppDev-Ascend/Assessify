@@ -1,0 +1,1 @@
+What term is commonly used to describe a small unit of data storage that is typically considered the smallest addressable element in a programming language?

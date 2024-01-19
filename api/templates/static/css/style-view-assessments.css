@@ -21,3 +21,7 @@
 .assessment-section .options li {
     margin: 10px 0px 10px 0px;
 }
+
+.answer {
+    font-size: 20px;
+}

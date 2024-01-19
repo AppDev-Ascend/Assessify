@@ -1,14 +1,11 @@
 from dotenv import load_dotenv
 import openai
-import openai
 import os
 import json
-import time
+
 from llama_index.llms import OpenAI
 from llama_index import VectorStoreIndex, SimpleDirectoryReader, ServiceContext, StorageContext, load_index_from_storage
-    
-from llama_index.llms import OpenAI
-from llama_index import VectorStoreIndex, SimpleDirectoryReader, ServiceContext, StorageContext, load_index_from_storage
+
 class AssessmentGenerator:
     
     def __init__(self):
@@ -43,85 +40,155 @@ class AssessmentGenerator:
             index = VectorStoreIndex.from_documents(documents, service_context=self.service_context)
 
         # Create response format
-        match(assessment_type):
-            case "Multiple Choice" | "multiple choice":
-                question = "multiple choice questions with important terms as an answer"
-                response_format = 'The result type should be provided in the following JSON data structure:\n\
-                                {\
-                                    "question": "Question", \
-                                    "options": ["Option 1", "Option 2", "Option 3", "Option 4"], \
-                                    "answer": Int Index \
-                                }\n\
-                                Separate each question with a these symbols >>>.\n\
-                                Respond only with the output in the exact format specified, with no explanation or conversation.'
-
-            case "Identification" | "identification" | "True or False" | "true or false":
-                question = "term identification question where the answer are important terms" if assessment_type.lower() == "identification" else "true or false questions"
-                response_format = 'The result type should be provided in the following JSON data structure:\n\
-                                {\
-                                    "question": "Question", \
-                                    "answer": "Answer" \
-                                }\n\
-                                Do not include numbers in the questions. Separate each question with a these symbols >>>.\n\
-                                Respond only with the output in the exact format specified, with no explanation or conversation.'
-
-            case "Fill in the Blanks" | "fill in the blanks":
-                question = "fill in the blanks questions term where the answer are important terms"
-                response_format = 'The result type should be provided in the following JSON data structure:\n\
-                                {\
-                                    "question": "Question with blank", \
-                                    "answer": "Answer" \
-                                }\n\
-                                Do not include numbers in the questions. Separate each question with a these symbols >>>.\n\
-                                Respond only with the output in the exact format specified, with no explanation or conversation.'
-            case "Essay" | "essay":
-                question = "essay questions"
-                response_format = 'The result type should be provided in the following JSON data structure:\n\
-                                { \
-                                    "question": "Question", \
-                                }\n\
-                                Do not include numbers in the questions. Separate each question with a these symbols >>>.\n\
-                                Respond only with the output in the exact format specified, with no explanation or conversation.'
-
-        # Format for the prompt
-        if learning_outcomes == [] or learning_outcomes == None:
-            my_prompt = f"Generate {number_of_questions} {question}.\n\n{response_format}"
-        else:
-            formatted_learning_outcomes = "\n".join(learning_outcomes)
-            my_prompt = f"Generate {number_of_questions} {question} that is aligned with these learning outcomes: \n\n{formatted_learning_outcomes}.\n\n{response_format}"
-        
-        if exclude_questions == True:
-            existing_excluded_questions = self.read_excluded_questions(fr'{lesson_path}\excluded_questions.txt')
-            my_prompt = my_prompt + f"\n\nPlease ensure to avoid creating questions similar to the following: \n\n{existing_excluded_questions}"
-        
-        print("Prompt: ", my_prompt)
-
-        query_engine = index.as_query_engine()
-        assessment = query_engine.query(my_prompt)
-      
-        assessment_str = str(assessment)
-        
-        quiz = {
-            "type": assessment_type,
-            "questions": []
-        }
-        
-        print(assessment_str)
-
         if number_of_questions != 1:
-            lines = assessment_str.split(">>>")
-        else:
-            lines = assessment_str
-        
-        excluded_questions = ""
+            match(assessment_type):
+                case "Multiple Choice" | "multiple choice":
+                    question = "multiple choice questions with important terms as an answer"
+                    response_format = 'The result type should be provided in the following JSON data structure:\n\
+                                    {\
+                                        "question": "Question", \
+                                        "options": ["Option 1", "Option 2", "Option 3", "Option 4"], \
+                                        "answer": Int Index \
+                                    }\n\
+                                    Separate each question with a these symbols >>>.\n\
+                                    Respond only with the output in the exact format specified, with no explanation or conversation.'
 
-        for line in lines:
-            if line != "":
-                question = json.loads(line)
-                quiz["questions"].append(question)
+                case "Identification" | "identification" | "True or False" | "true or false":
+                    question = "term identification question where the answer are important terms" if assessment_type.lower() == "identification" else "true or false questions"
+                    response_format = 'The result type should be provided in the following JSON data structure:\n\
+                                    {\
+                                        "question": "Question", \
+                                        "answer": "Answer" \
+                                    }\n\
+                                    Do not include numbers in the questions. Separate each question with a these symbols >>>.\n\
+                                    Respond only with the output in the exact format specified, with no explanation or conversation.'
+
+                case "Fill in the Blanks" | "fill in the blanks":
+                    question = "fill in the blanks questions term where the answer are important terms"
+                    response_format = 'The result type should be provided in the following JSON data structure:\n\
+                                    {\
+                                        "question": "Question with blank", \
+                                        "answer": "Answer" \
+                                    }\n\
+                                    Do not include numbers in the questions. Separate each question with a these symbols >>>.\n\
+                                    Respond only with the output in the exact format specified, with no explanation or conversation.'
+                case "Essay" | "essay":
+                    question = "essay questions"
+                    response_format = 'The result type should be provided in the following JSON data structure:\n\
+                                    { \
+                                        "question": "Question", \
+                                    }\n\
+                                    Do not include numbers in the questions. Separate each question with a these symbols >>>.\n\
+                                    Respond only with the output in the exact format specified, with no explanation or conversation.'
+        else:
+            match(assessment_type):
+                case "Multiple Choice" | "multiple choice":
+                    question = "multiple choice questions with important terms as an answer"
+                    response_format = 'The result type should be provided in the following JSON data structure:\n\
+                                    {\
+                                        "question": "Question", \
+                                        "options": ["Option 1", "Option 2", "Option 3", "Option 4"], \
+                                        "answer": Int Index \
+                                    }\n\
+                                    Respond only with the output in the exact format specified, with no explanation or conversation or other text that wraps it or says it is a json.\n \
+                                    Do not wrap it with ```json ``` or ```json\n```'
+
+                case "Identification" | "identification":
+                    question = "term identification question where the answer are important terms"
+                    response_format = 'The result type should be provided in the following JSON data structure:\n\
+                                    {\
+                                        "question": "Question", \
+                                        "answer": "Answer" \
+                                    }\n\
+                                    Respond only with the output in the exact format specified, with no explanation or conversation or other text that wraps it or says it is a json.\n \
+                                    Do not wrap it with ```json ``` or ```json\n```'
+
+                case "Fill in the Blanks" | "fill in the blanks":
+                    question = "fill in the blanks questions term where the answer are important terms"
+                    response_format = 'The result type should be provided in the following JSON data structure:\n\
+                                    {\
+                                        "question": "Question with blank", \
+                                        "answer": "Answer" \
+                                    }\n\
+                                    Respond only with the output in the exact format specified, with no explanation or conversation or other text that wraps it or says it is a json.\n \
+                                    Do not wrap it with ```json ``` or ```json\n```'
+                
+                case "Essay" | "essay":
+                    question = "essay questions"
+                    response_format = 'The result type should be provided in the following JSON data structure:\n\
+                                    { \
+                                        "question": "Question", \
+                                    }\n\
+                                    Respond only with the output in the exact format specified, with no explanation or conversation.\n \
+                                    Do not wrap it with ```json ``` or ```json\n```'
+                
+                case "True or False" | "true or false":
+                    question = "true or false questions"
+                    response_format = 'The result type should be provided in the following JSON data structure:\n\
+                                    {\
+                                        "question": "Question", \
+                                        "answer": Boolean Value \
+                                    }\n\
+                                    Respond only with the output in the exact format specified, with no explanation or conversation or other text that wraps it or says it is a json.\n \
+                                    Do not wrap it with ```json ``` or ```json\n```'
+
+        questions_left = number_of_questions
+
+        quiz = {
+                "type": assessment_type,
+                "questions": []
+            }
+
+        while questions_left > 0:
+            if questions_left  >= 10:
+                generate_questions = 10
+            else:
+                generate_questions = questions_left
+
+            # Format for the prompt
+            if learning_outcomes == [] or learning_outcomes == None:
+                my_prompt = f"Generate {generate_questions} {question}.\n\n{response_format}"
+            else:
+                formatted_learning_outcomes = "\n".join(learning_outcomes)
+                my_prompt = f"Generate {generate_questions} {question} that is aligned with these learning outcomes: \n\n{formatted_learning_outcomes}.\n\n{response_format}"
+            
+            if exclude_questions == True:
+                existing_excluded_questions = self.read_excluded_questions(fr'{lesson_path}\excluded_questions.txt')
+                my_prompt = my_prompt + f"\n\nPlease ensure to avoid creating questions similar to the following: \n\n{existing_excluded_questions}"
+            
+            print("Prompt: ", my_prompt)
+
+            query_engine = index.as_query_engine()
+            assessment = query_engine.query(my_prompt)
+        
+            assessment_str = str(assessment)
+            
+            
+            
+            print(assessment_str)
+
+            
+            excluded_questions = ""
+
+            if number_of_questions != 1:
+                lines = assessment_str.split(">>>")
+                for line in lines:
+                    if line != "":
+                        question_json = json.loads(line)
+                        quiz["questions"].append(question_json)
+
+                        if exclude_questions == True:
+                            excluded_questions = question["question"] + "\n" + excluded_questions
+            else:
+                question = json.loads(assessment_str)
+                quiz["questions"].append(question_json)
 
                 if exclude_questions == True:
-                    excluded_questions = question["question"] + "\n" + excluded_questions
+                        excluded_questions = question["question"] + "\n" + excluded_questions
+            
+            questions_left -= 10
+
+      
         
         if exclude_questions == True and assessment_type in ["Multiple Choice", "multiple choice", "Identification", "identification", "Essay", "essay"]:
             exclude_questions = excluded_questions + self.read_excluded_questions(fr'{lesson_path}\excluded_questions.txt')
@@ -164,7 +231,5 @@ class AssessmentGenerator:
             })
 
             counter += 1
-
-        print(exam)
 
         return exam

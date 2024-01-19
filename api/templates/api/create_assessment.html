@@ -57,6 +57,7 @@
           <input type="file" id="fileInput" class="custom-file-input" name="lesson_file" onchange="displayFileName(this)">
           <span class="custom-file-name" id="fileNameDisplay">No file chosen</span>
         </div>
+        <button type="button" id="removeFile" class="remove-file" onclick="removeTheFile()">Remove File</button>
       </div>
       <div class="generator-attributes-form">
         <h2> AI Generator Settings </h2>
@@ -86,12 +87,13 @@
           </div>
 
           <label> Learning Outcomes: </label>
-          <div class="learning-outcomes" id="learning-outcomes_{{ sectionCounter }}"></div>
+          <div class="learning-outcomes" id="learning-outcomes_{{ sectionCounter }}">
+
+          </div>
           <button class="generic-button-variant" onclick="addInputElement('learning-outcomes_{{ sectionCounter }}')" type="button"> Add Learning Outcome </button>
         {% else %}
           <button class="generic-button-variant-2" id="section-.add-button" type="button" onclick="addNewSection()"> Add Exam Part/Section </button>
           <div id="assessment-section-container">
-          
           </div>
         {% endif %}
         

@@ -1,0 +1,25 @@
+::Question::Who were the authors that introduced the Bridge Design Pattern??
+~ Gang of Four
+~ The Beatles
+~ The Programming Trio
+~ The Software Quartet
+::Question::What is the main benefit of using the Bridge Design Pattern in terms of code structure??
+~ Increased complexity
+~ Reduced readability
+~ Separation of concerns
+~ Higher coupling
+::Question::In the Bridge Design Pattern, what can be independently evolved without affecting each other??
+~ Client and Server
+~ Interface and Implementation
+~ Class and Object
+~ Method and Property
+::Question::Which of the following is a real-world application of the Bridge Design Pattern??
+~ Integrating multiple payment gateways in e-commerce platforms
+~ Creating a single-threaded application
+~ Developing a monolithic software architecture
+~ Building a static website
+::Question::What is a potential downside of the Bridge Design Pattern when it comes to performance??
+~ Faster execution time
+~ Reduced memory usage
+~ Multiple indirections
+~ Simplified debugging
