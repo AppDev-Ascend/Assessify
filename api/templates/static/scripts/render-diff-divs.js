@@ -15,16 +15,3 @@ document.addEventListener("DOMContentLoaded", function() {
         icon.src = "static/media/exam-icon.png";
     }
 });
-
-function addInputElement(containerID) {
-    console.log(containerID);
-    var newInput = document.createElement('input');
-    var section_no = containerID.split('_')[1];
-
-    newInput.type = 'text';
-    newInput.placeholder = `Learning Outcome ${document.getElementById(containerID).childElementCount + 1}`;
-    newInput.name = `learning-outcomes_${section_no}_${document.getElementById(containerID).childElementCount + 1}`;
-
-    newInput.classList.add('generic-form-textbox');
-    document.getElementById(containerID).appendChild(newInput);
-}

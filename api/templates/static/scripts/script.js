@@ -46,10 +46,21 @@ document.addEventListener("input", function(event) {
 function rl_showLogin() {
     var register_div = document.getElementById('register-container');
     var login_div = document.getElementById('login-container');
+    var login_nav = document.getElementById('nav-element-login')
+    var register_nav = document.getElementById('nav-element-register')
 
     if (login_div.style.display === 'none') {
         login_div.style.display = 'block';
         register_div.style.display = 'none';
+
+    } else {
+        login_div.style.display = 'none';
+        register_div.style.display = 'block';
+    }
+
+    if(login_nav.style.display === 'none') {
+        login_nav.style.display = 'flex';
+        register_nav.style.display = 'none';
     }
 }
 
