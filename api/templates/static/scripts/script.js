@@ -3,29 +3,29 @@ document.addEventListener("DOMContentLoaded", function() {
     showSlides();
 
     function showSlides() {
-    let slides = document.getElementsByClassName("slideshow-image");
+        let slides = document.getElementsByClassName("slideshow-image");
 
-    // Check if there are slides and if slideIndex is within valid range
-    if (slides.length > 0) {
-        // Hide all slides
-        for (let i = 0; i < slides.length; i++) {
-        slides[i].style.display = "none";
+        // Check if there are slides and if slideIndex is within valid range
+        if (slides.length > 0) {
+            // Hide all slides
+            for (let i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none";
+            }
+
+            // Increment slideIndex and check if it's within range
+            slideIndex++;
+            if (slideIndex > slides.length) {
+            slideIndex = 1;
+            }
+
+            // Display the current slide
+            slides[slideIndex - 1].style.display = "block";
+
+            // Set the timeout for the next slide
+            setTimeout(showSlides, 7500);
+        } else {
+            console.error("No slides found with class 'slideshow-image'");
         }
-
-        // Increment slideIndex and check if it's within range
-        slideIndex++;
-        if (slideIndex > slides.length) {
-        slideIndex = 1;
-        }
-
-        // Display the current slide
-        slides[slideIndex - 1].style.display = "block";
-
-        // Set the timeout for the next slide
-        setTimeout(showSlides, 7500);
-    } else {
-        console.error("No slides found with class 'slideshow-image'");
-    }
     }
 });
 
@@ -82,7 +82,7 @@ window.onclick = function(event) {
     dropdownContainers.forEach(function(container) {
         var dropdownOptions = container.querySelector('.dropdown-options');
         if (dropdownOptions.style.display === 'block' && !event.target.matches('.generic-form-textbox') && !event.target.matches('.dropdown-options li')) {
-        dropdownOptions.style.display = 'none';
+            dropdownOptions.style.display = 'none';
         }
     });
 }
@@ -100,9 +100,29 @@ function selectOption(option) {
 }
 
 function displayFileName(input) {
+    console.log("Display file name called")
     const fileNameDisplay = document.getElementById('fileNameDisplay');
     const fileName = input.files[0] ? input.files[0].name : 'No file chosen';
     fileNameDisplay.textContent = fileName;
+    document.getElementById('removeFile').style.display = 'block'; // Show the remove file button
+}
+  
+function removeTheFile() {
+    console.log("Remove file called")
+    document.getElementById('fileInput').value = '';
+    document.getElementById('fileNameDisplay').textContent = 'No file chosen';
+    document.getElementById('removeFile').style.display = 'none'; // Hide the remove file button
+}
+
+window.onload = function() {
+    var input = document.getElementById('fileInput');
+    var fileName = input.files[0] ? input.files[0].name : 'No file chosen';
+    
+    if (fileName !== 'No file chosen') {
+        document.getElementById('removeFile').style.display = 'block'; // Show the remove file button
+    } 
+    
+    document.getElementById('fileNameDisplay').textContent = fileName;
 }
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -128,35 +148,39 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function addNewSection() {
-    var newAssessmentSection = document.createElement('div');
-    newAssessmentSection.classList.add('assessment-section');
 
-    newAssessmentSection.innerHTML = `
-        <h2 class="exam-part"> Section ${sectionCounter} </h2> <br>
-        <label> Assessment Type </label>
-        <div class="dropdown-container">
-            <input type="text" class="generic-form-textbox" placeholder="Select an option" onclick="toggleDropdown(this)" name="section-type_${sectionCounter}" readonly>
-            <ul class="dropdown-options">
-            <li onclick="selectOption(this)">Multiple Choice</li>
-            <li onclick="selectOption(this)">True or False</li>
-            <li onclick="selectOption(this)">Fill in The Blanks</li>
-            <li onclick="selectOption(this)">Identification</li>
-            <li onclick="selectOption(this)">Essay</li>
-            </ul>
-        </div>
-        
-        <label> Assessment Length </label>
-        <div class="dropdown-container">
-            <input type="number" class="generic-form-textbox" name="section-length_${sectionCounter}" min="1" max="20">
-        </div>
+    if(creationType == "exam") {
+        var newAssessmentSection = document.createElement('div');
+        newAssessmentSection.classList.add('assessment-section');
 
-        <label> Learning Outcomes: </label>
-        <div class="learning-outcomes" id="learning-outcomes_${sectionCounter}"></div>
-        <button class="generic-button-variant" onclick="addInputElement('learning-outcomes_${sectionCounter}')" type="button"> Add Learning Outcome </button>
-    `;
+        newAssessmentSection.innerHTML = `
+            <h2 class="exam-part"> Section ${sectionCounter} </h2> <br>
+            <label> Assessment Type </label>
+            <div class="dropdown-container">
+                <input type="text" class="generic-form-textbox" placeholder="Select an option" onclick="toggleDropdown(this)" name="section-type_${sectionCounter}" readonly>
+                <ul class="dropdown-options">
+                <li onclick="selectOption(this)">Multiple Choice</li>
+                <li onclick="selectOption(this)">True or False</li>
+                <li onclick="selectOption(this)">Fill in The Blanks</li>
+                <li onclick="selectOption(this)">Identification</li>
+                <li onclick="selectOption(this)">Essay</li>
+                </ul>
+            </div>
+            
+            <label> Assessment Length </label>
+            <div class="dropdown-container">
+                <input type="number" class="generic-form-textbox" name="section-length_${sectionCounter}" min="1" max="20">
+            </div>
 
-    document.getElementById('assessment-section-container').appendChild(newAssessmentSection);
-    sectionCounter++;
+            <label> Learning Outcomes: </label>
+            <div class="learning-outcomes" id="learning-outcomes_${sectionCounter}"></div>
+            <button class="generic-button-variant" onclick="addInputElement('learning-outcomes_${sectionCounter}')" type="button"> Add Learning Outcome </button>
+        `;
+
+        document.getElementById('assessment-section-container').appendChild(newAssessmentSection);
+        sectionCounter++;
+    }
+    
 }
 
 var learningOutcomeCounter = 0;
