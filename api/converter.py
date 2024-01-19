@@ -5,7 +5,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from pdf2image import convert_from_path
 from docx import Document
-from docx.enum.text import WD_BREAK
+from docx.enum.text import WD_BREAK 
 
 class Converter:
 
