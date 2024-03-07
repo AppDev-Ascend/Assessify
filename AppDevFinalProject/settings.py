@@ -30,9 +30,19 @@ ALLOWED_HOSTS = ['*']
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
-    'https://main--test-assessify.netlify.app'
+    'https://main--test-assessify.netlify.app',
+    'https://fordeploy--test-assessify.netlify.app'
 ]
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000'
+]
+
 CORS_ALLOW_CREDENTIALS = True
+# Set the session cookie secure flag based on your environment
+SESSION_COOKIE_SECURE = False  # Set to True in production if using HTTPS
+
+CSRF_COOKIE_SECURE = False  # Set to True in production if using HTTPS
+CSRF_COOKIE_SAMESITE = 'None'  # Allow cross-site requests in development
 
 
 # Application definition
@@ -58,6 +68,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+CORS_ORIGIN_WHITELIST = [
+     'http://localhost:3000',
 ]
 
 ROOT_URLCONF = 'AppDevFinalProject.urls'

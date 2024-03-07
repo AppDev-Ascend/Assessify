@@ -44,7 +44,7 @@ class Converter:
 
         Note:
         - This method creates a PDF document with formatted content based on the quiz assessment.
-        - The PDF is saved to the 'Files' directory with the naming convention 'assessment_{type}.pdf'.
+        - The PDF is saved to the 'Project Files' directory with the naming convention 'assessment_{type}.pdf'.
         - The method supports different types of assessments, each with specific formatting.
         - The assessment dictionary should have the structure consistent with the expected format for the given type.
         """
@@ -55,7 +55,6 @@ class Converter:
         pdf_canvas.setFont("Helvetica-Bold", 14)
         pdf_canvas.drawString(50, 770, f"{type}")
         pdf_canvas.setFont("Helvetica", 12)
-
 
         # Extract information from the JSON
         questions = assessment.get("questions", [])
@@ -73,7 +72,7 @@ class Converter:
 
             question_text = question.get("question", "")
 
-            if type == "Multiple Choice":
+            if type == "multiple choice":
                 options = question.get("options", [])
                 pdf_canvas.drawString(x_position, y_position, f"{index}. {question_text}")
 
@@ -89,7 +88,7 @@ class Converter:
                             pdf_canvas.drawString(x_position + 28, y_position - 2, wrapped_option_line)
                         y_position -= line_height
 
-            elif type == "Identification":
+            elif type == "identification":
                 wrapped_text_lines = Converter.wrap_text(f"{index}. {question_text}", max_line_length)
                 for i, wrapped_text_line in enumerate(wrapped_text_lines):
                     if i == 0:
@@ -98,7 +97,7 @@ class Converter:
                         pdf_canvas.drawString(x_position + 15, y_position, wrapped_text_line)
                     y_position -= line_height
 
-            elif type == "True or False":
+            elif type == "true or false":
                 wrapped_text_lines = Converter.wrap_text(f"{index}. {question_text}", max_line_length)
                 for i, wrapped_text_line in enumerate(wrapped_text_lines):
                     if i == 0:
@@ -107,7 +106,7 @@ class Converter:
                         pdf_canvas.drawString(x_position + 15, y_position, wrapped_text_line)
                     y_position -= line_height
 
-            elif type == "Fill in the Blanks":
+            elif type == "fill in the blanks":
                 lines = Converter.wrap_text(f"{index}. {question_text}", max_line_length)
                 for i, line in enumerate(lines):
                     if i == 0:
@@ -116,7 +115,7 @@ class Converter:
                         pdf_canvas.drawString(x_position + 15, y_position-5, line)
                     y_position -= line_height
 
-            elif type == "Essay":
+            elif type == "essay":
                 lines = Converter.wrap_text(f"{index}. {question_text}", max_line_length)
                 for i, line in enumerate(lines):
                     if i == 0:
@@ -150,7 +149,7 @@ class Converter:
         questions = assessment.get("questions", [])
 
         # Create a PDF document for the answer key
-        pdf_canvas = canvas.Canvas(fr"api\media\exports\quiz_answer_key_{type}.pdf", pagesize=letter)
+        pdf_canvas = canvas.Canvas(fr"api\media\files\exports\quiz_answer_key_{type}.pdf", pagesize=letter)
 
         # Add content to the PDF
         pdf_canvas.setFont("Helvetica", 12)
@@ -161,13 +160,13 @@ class Converter:
         for index, question in enumerate(questions, start=1):
             y_position -= 15  # Adjust the vertical position for each question
 
-            if type == "Multiple Choice":
-                correct_answer = f"Question {index}: {chr(97 + question['answer'])}"
-            elif type == "Identification":
+            if type == "multiple choice":
                 correct_answer = f"Question {index}: {question['answer']}"
-            elif type == "True or False":
+            elif type == "identification":
+                correct_answer = f"Question {index}: {question['answer']}"
+            elif type == "true or false":
                 correct_answer = f"Question {index}: {'True' if question['answer'] else 'False'}"
-            elif type == "Fill in the Blanks":
+            elif type == "fill in the blanks":
                 correct_answer = f"Question {index}: {question['answer']}"
 
             pdf_canvas.drawString(120, y_position, correct_answer)
@@ -194,7 +193,7 @@ class Converter:
         """
 
         # Create a PDF document
-        pdf_canvas = canvas.Canvas(r"api\media\exports\exam.pdf", pagesize=letter)
+        pdf_canvas = canvas.Canvas(r"api\media\files\exports\exam.pdf", pagesize=letter)
 
         # Add a header to the PDF
         pdf_canvas.setFont("Helvetica-Bold", 14)
@@ -234,7 +233,7 @@ class Converter:
                     options = question.get("options", [])
                     for option_index, option in enumerate(options, start=1):
                         y_position -= line_height  # Adjust the vertical position for each option
-                        wrapped_option_lines = Converter.wrap_text(f"{chr(96 + option_index)}. {option}", max_line_length)
+                        wrapped_option_lines = Converter.wrap_text(f"{option}", max_line_length)
                         for i, wrapped_option_line in enumerate(wrapped_option_lines):
                             if i == 0:
                                 y_position -= line_height
@@ -271,7 +270,7 @@ class Converter:
         """
 
         # Create a PDF document for the answer key
-        pdf_canvas = canvas.Canvas(r"api\media\exports\exam_answer_key.pdf", pagesize=letter)
+        pdf_canvas = canvas.Canvas(r"api\media\files\exports\exam_answer_key.pdf", pagesize=letter)
 
         # Add content to the PDF
         pdf_canvas.setFont("Helvetica", 12)
@@ -345,7 +344,7 @@ class Converter:
         return lines
 
     @staticmethod
-    def quiz_to_gift(json_data, output_file):
+    def quiz_to_gift(json_data):
         """
         Convert a quiz assessment in JSON format to a GIFT (General Import Format Template) file.
 
@@ -398,7 +397,7 @@ class Converter:
                 gift_string += f"::Question::{question_text}?\n"
 
         # Save the GIFT content to the specified output file
-        with open(output_file, "w") as file:
+        with open(r"api\media\files\exports\quiz_gift.txt", "w") as file:
             file.write(gift_string)
 
     @staticmethod
@@ -460,7 +459,7 @@ class Converter:
                     gift_string += f"::Question::{question_text}?\n"
 
         # Save the GIFT content to the specified output file
-        with open(output_file, "w") as file:
+        with open(r"api\media\files\exports\exam_gift.txt", "w") as file:
             file.write(gift_string)
 
         return gift_string

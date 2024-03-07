@@ -261,7 +261,7 @@ class AssessmentQuestionsView(APIView):
         return Response(request.data, status=status.HTTP_202_ACCEPTED)
 
 
-class ExportView(APIView):
+class AssessmentExportView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
     authentication_classes = (SessionAuthentication,)
 
@@ -272,26 +272,35 @@ class ExportView(APIView):
             assessment_dict = model_to_dict(assessment)
             json_data = json.dumps(assessment_dict)
             serializer = AssessmentSerializer(instance=assessment)
-            full_dict = {}
             question_list = list(Question.objects.filter(assessment=assessment))
+            question_dict = {'type': assessment.type}
             question_data_list = []
             
             for i, q in enumerate(question_list):
+                # if assessment.type == 'Multiple Choice':
+                options = list(Option.objects.filter(question=q).values_list('option', flat=True))
+                
                 question_data = {
                     'question': q.question,
-                    'answer': q.answer,
-                    'options': list(Option.objects.filter(question=q).values('option_no', 'option'))
+                    'options': options,
+                    'answer': q.answer
                 }
+                
+                option_answer = Option.objects.filter(question=q, option_no=question_data['answer']).values('option')
+                question_data['answer'] = option_answer[0]['option']
                 question_data_list.append(question_data)
 
-            full_dict['questions'] = question_data_list
+            question_dict['questions'] = question_data_list
             request.session['assessment'] = assessment.pk
-            json_data = json.dumps(full_dict)
+
+            with open('question_dict.json', 'w') as f:
+                json.dump(question_dict, f)
+
+
+            pdf_data = Converter.quiz_to_pdf(assessment=question_dict, type=assessment.type)
+            Converter.quiz_answer_key(assessment=question_dict, type=assessment.type)
             
-            converter = Converter()
-            pdf_data = converter.quiz_to_pdf(full_dict, assessment.type)
-            
-            return JsonResponse({"full_dict": full_dict}, status=status.HTTP_200_OK)
+            return JsonResponse(question_dict, status=status.HTTP_200_OK)
         except Assessment.DoesNotExist:
             return Response({"error": "Assessment not found"}, status=status.HTTP_404_NOT_FOUND)
 
